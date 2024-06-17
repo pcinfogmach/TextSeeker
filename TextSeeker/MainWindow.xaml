@@ -3,165 +3,168 @@
          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-         xmlns:src="clr-namespace:TextSeeker"
+         xmlns:treeItems="clr-namespace:TextSeeker"
          xmlns:helpers="clr-namespace:TextSeeker.Helpers"
          xmlns:webView="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
-         Background="WhiteSmoke"
-         FlowDirection="RightToLeft"
-         Height="450" Width="800"        
-        FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}"
-        Closing="Window_Closing">
-    <Grid Margin="5,5,5,0">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="5" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="5" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="5" />
-            <RowDefinition Height="auto" />
-        </Grid.RowDefinitions>
+        FontFamily="Segoe UI Semilight"
+        FontSize="14"
+        Background="WhiteSmoke"
+        FlowDirection="RightToLeft"
+        Height="450" Width="800"
+         FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}">
+    <Grid Margin="5" FlowDirection="LeftToRight">
+        <Grid.Resources>
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="{x:Null}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FlowDirection" Value="LeftToRight"/>
+                <Setter Property="Padding" Value="3"/>
+            </Style>
+            <Style TargetType="ToggleButton">
+                <Setter Property="Background" Value="{x:Null}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FlowDirection" Value="LeftToRight"/>
+                <Setter Property="Padding" Value="3"/>
+            </Style>
+            <Style TargetType="Image">
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
+                <Setter Property="Height" Value="20"/>
+            </Style>
+            <Style TargetType="GridSplitter">
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            </Style>
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="5" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <Grid x:Name="SearchPanel" Grid.ColumnSpan="3" Grid.Row="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="5"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
+        <StackPanel  Grid.Row="0" Grid.ColumnSpan="3" >
+            <Border  x:Name="SearchPanel" IsEnabled="{Binding SearchIsEnabled}"
+                 BorderBrush="LightGray" BorderThickness="1"
+                 Background="White">
+                <Grid>
+                    <TextBox x:Name="SearchTextBox" BorderThickness="0" VerticalAlignment="Center" Margin="2,0,2,0"
+                             Text="{Binding SearchTerm , UpdateSourceTrigger=PropertyChanged, BindsDirectlyToSource=True}" 
+                             PreviewKeyDown="SearchTextBox_PreviewKeyDown"
+                             FlowDirection="RightToLeft"/>
+                    <Grid HorizontalAlignment="Left">
+                        <Button x:Name="StopSearchButton" Width="25" Visibility="{Binding StopButtonvisibilty}"
+                             Click="SearchButton_Click">
+                            <TextBlock Text="■" FontSize="12" VerticalAlignment="Center"/>
+                        </Button>
+                        <Button x:Name="SearchButton" Visibility="{Binding SearchButtonvisibilty}"
+                            Click="SearchButton_Click">
+                            <Image Source="/Resources/SearchIcon.png" Height="16"/>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+        </StackPanel>
 
-            <TextBox x:Name="SearchTextBox" 
-                     Background="White" BorderBrush="LightGray"
-                     Text="{Binding SearchTerm, Mode=TwoWay, BindsDirectlyToSource=True, UpdateSourceTrigger=PropertyChanged}"
-                     KeyDown="SearchTextBox_KeyDown"
-                      IsEnabled="{Binding IsEnabled}"/>
-            <Button x:Name="SearchButton" Content="{Binding SearchButtonText}" Margin="3,0,3,0.5" 
-                Background="{x:Null}" BorderThickness="0" 
-                    Grid.Row="0" HorizontalAlignment="Right"
-                    Click="SearchButton_Click"
-                     IsEnabled="{Binding IsEnabled}"/>
+        <ProgressBar x:Name="progressBar" Height="5" BorderThickness="0" Background="{x:Null}"
+               IsIndeterminate="{Binding IsSearchInProgress}"
+                     Grid.ColumnSpan="3" Grid.Row="1"/>
 
-            <ProgressBar x:Name="SearchProgressBar" Grid.Row="1" 
-                         Background="{x:Null}" BorderThickness="0" Height="3"
-                         IsIndeterminate="{Binding IsSearchInProgress}"/>
 
-            <!--<StackPanel Orientation="Horizontal" Grid.Row="2">
-                <ComboBox x:Name="SearchMethodsComboBox" MinWidth="100"/>
-                <CheckBox x:Name="SearchFileNamesCheckBox" Content="חפש גם בשמות הקבצים" VerticalAlignment="Center" 
-                      Margin="5,0,0,2"/>
-            </StackPanel>-->
-        </Grid>
-
-        <Border Grid.Column="0" Grid.Row="2" Grid.RowSpan="3"
-                BorderBrush="LightGray" BorderThickness="1">
-        <Grid >
+        <Grid x:Name="ItemsPanel" Grid.Row="2" Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="Height" Value="25"/>
-                    <Setter Property="Background" Value="{x:Null}"/>
-                    <Setter Property="BorderThickness" Value="0"/>
-                </Style>
-            </Grid.Resources>
 
-                <StackPanel Orientation="Horizontal" Grid.Row="0" >
-                <Button x:Name="AddTreeItemButton" ToolTip="הוסף מיקומים לחיפוש" 
-                        Click="AddTreeItemButton_Click">
-                    <Image Source="/Resources/AddItem.png" />
+            <StackPanel Orientation="Horizontal" Grid.Row="0"
+                        MinWidth="200">
+                <Button x:Name="AddTreeItem" Click="AddTreeItemButton_Click">
+                    <Image Source="/Resources/AddFolderIcon.png" />
                 </Button>
-                
-                <Button x:Name="DeleteTreeItemButton" ToolTip="מחק את המיקום המסומן" 
-                        Click="DeleteTreeItemButton_Click">
-                    <Image Source="/Resources/DeleteItem.png" />
+                <Button x:Name="RemoveTreeItem" Click="DeleteTreeItemButton_Click">
+                    <Image Source="/Resources/DeleteFolderIcon.png" />
                 </Button>
-                
-                <!--<Button x:Name="AboutButton" ToolTip="אודות">
-                    <Border  BorderBrush="Black" BorderThickness="2" Margin="3"  Width="18">
-                        <TextBlock Text="!" FontWeight="Bold"
-                               TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                </Button>-->
+                <Grid x:Name="IndexMenu" ToolTip="אינדקס">
+                    <ComboBox Height="0" x:Name="IndexMenuList">
+                        <ComboBoxItem Content="צור אינדקס חדש"/>
+                        <ComboBoxItem Content="עדכן אינדקס"/>
+                        <ComboBoxItem Content="מחק אינדקס"/>
+                    </ComboBox>
+                    <Button x:Name="IndexMenuButton" Click="IndexMenuButton_Click">
+                        <Image Source="/Resources/DataBaseImport.png" Height="18"/>
+                    </Button>
+                </Grid>
+                <ToggleButton x:Name="IndexedSearch">
+                    <Image Source="/Resources/SearchDataBase.png" Height="18"/>
+                </ToggleButton>
             </StackPanel>
-            
-            <TreeView Name="DirectoryTreeView" Grid.Row="1" 
-                      BorderBrush="LightGray"  BorderThickness="0"
-                      ItemsSource="{Binding RootTreeViewNode.Children, Mode=TwoWay}">
+
+            <TreeView x:Name="treeView" Grid.Row="1" ItemsSource="{Binding RootTreeViewNode.Children}">
                 <TreeView.Resources>
-                        <Style TargetType="TreeViewItem">
-                            <EventSetter Event="PreviewMouseDoubleClick" Handler="FileItem_MouseDoubleClick"/>
-                            <EventSetter Event="PreviewKeyDown" Handler="FileItem_KeyDown"/>
-                            <Setter Property="Tag" Value="{Binding}"/>
-                        </Style>
-                    <HierarchicalDataTemplate DataType="{x:Type src:FolderTreeNode}" ItemsSource="{Binding Children, Mode=TwoWay}">
+                    <HierarchicalDataTemplate DataType="{x:Type treeItems:FolderTreeNode}" ItemsSource="{Binding Children, Mode=TwoWay}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="📁" FontSize="14" LineStackingStrategy="BlockLineHeight" LineHeight="15"/>
                             <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" />
                             <TextBlock Text="{Binding Name}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type src:FileTreeNode}">
+                    <DataTemplate DataType="{x:Type treeItems:FileTreeNode}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="🗎"  FontSize="16" LineStackingStrategy="BlockLineHeight" LineHeight="17"/>
                             <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" />
                             <TextBlock Text="{Binding Name}"/>
                         </StackPanel>
                     </DataTemplate>
+                    <Style TargetType="TreeViewItem">
+                        <EventSetter Event="MouseDoubleClick" Handler="FileItem_MouseDoubleClick"/>
+                        <EventSetter Event="PreviewKeyDown" Handler="FileItem_KeyDown"/>
+                        <Setter Property="Tag" Value="{Binding}"/>
+                    </Style>
                 </TreeView.Resources>
             </TreeView>
+
+            <GridSplitter Grid.Row="2"/>
+
+            <ListView x:Name="ResultsListView" Grid.Row="3" ItemsSource="{Binding SearchResults}">
+                <ListView.Resources>
+                    <Style TargetType="ListViewItem">
+                        <EventSetter Event="MouseDoubleClick" Handler="FileItem_MouseDoubleClick"/>
+                        <EventSetter Event="PreviewKeyDown" Handler="FileItem_KeyDown"/>
+                        <EventSetter Event="Selected" Handler="ListViewItem_Selected"/>
+                        <Setter Property="Tag" Value="{Binding}"/>
+                    </Style>
+                </ListView.Resources>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" Margin="2" FontWeight="Bold"/>
+                                <!--<TextBlock Text="{Binding DateLastModified}" Margin="2"/>-->
+                            </StackPanel>
+                            <!--<TextBlock Text="{Binding Directory}" Margin="2"/>-->
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </Grid>
-        </Border>
 
-        <!--<TextBox x:Name="StatusTextBlock" Grid.Column="0" Grid.Row="4" BorderBrush="LightGray" Background="White"
-             IsReadOnly="True"/>-->
+        <GridSplitter Grid.Column="1" Grid.Row="2"/>
 
-        <GridSplitter Grid.Column="1" Grid.Row="2" Grid.RowSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-        <GridSplitter Grid.Row="3" Grid.Column="2"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-     
-        <DataGrid x:Name="SearchResultsDataGrid" Grid.Column="2" Grid.Row="2"
-                  BorderBrush="LightGray" Background="White"
-                  ItemsSource="{Binding SearchResults}"
-                  HorizontalGridLinesBrush ="{x:Null}"
-                  VerticalGridLinesBrush="WhiteSmoke"
-                  CanUserResizeRows="False"
-                  IsReadOnly="True"
-                  FlowDirection="LeftToRight"
-                  AutoGenerateColumns="False"
-                  SelectionChanged="SearchResultsDataGrid_SelectionChanged">
-            <DataGrid.Resources>
-                <Style TargetType="DataGridCell">
-                    <EventSetter Event="MouseDoubleClick" Handler="FileItem_MouseDoubleClick"/>
-                    <EventSetter Event="PreviewKeyDown" Handler="FileItem_KeyDown"/>
-                    <Setter Property="Tag" Value="{Binding}"/>
-                </Style>
-                <Style TargetType="DataGridRowHeader">
-                    <Setter Property="Background" Value="{x:Null}"/>
-                </Style>
-            </DataGrid.Resources>
-            <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Name}"/>
-                <DataGridTextColumn Binding="{Binding Directory}"/>
-                <DataGridTextColumn Binding="{Binding DateLastModified}"/>
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <Border Background="White" BorderBrush="LightGray" BorderThickness="1"
-                Grid.Column="3" Grid.Row="4">
+        <Border x:Name="PreviewPanel" Background="White" BorderBrush="LightGray" BorderThickness="1"
+                Grid.Row="2" Grid.Column="2">
             <Grid>
                 <TextBlock Text="תצוגה מקדימה" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="LightGray"/>
                 <webView:WebView2 Name="PreviewBrowser"/>
             </Grid>
         </Border>
-
-        <StatusBar Grid.Row="6" Grid.ColumnSpan="3" Height="10">
-            <StatusBarItem>
-            </StatusBarItem>
-        </StatusBar>
+    
     </Grid>
 </Window>
+
+        

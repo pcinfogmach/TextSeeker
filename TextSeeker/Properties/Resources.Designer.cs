@@ -63,6 +63,16 @@ namespace TextSeeker.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AddFolderIcon {
+            get {
+                object obj = ResourceManager.GetObject("AddFolderIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap AddItem {
             get {
                 object obj = ResourceManager.GetObject("AddItem", resourceCulture);
@@ -73,9 +83,59 @@ namespace TextSeeker.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DataBaseImport {
+            get {
+                object obj = ResourceManager.GetObject("DataBaseImport", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DeleteDataBase {
+            get {
+                object obj = ResourceManager.GetObject("DeleteDataBase", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DeleteFolderIcon {
+            get {
+                object obj = ResourceManager.GetObject("DeleteFolderIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap DeleteItem {
             get {
                 object obj = ResourceManager.GetObject("DeleteItem", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SearchDataBase {
+            get {
+                object obj = ResourceManager.GetObject("SearchDataBase", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SearchIcon {
+            get {
+                object obj = ResourceManager.GetObject("SearchIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

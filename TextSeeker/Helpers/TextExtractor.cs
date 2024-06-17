@@ -13,12 +13,13 @@ namespace TextSeeker.Helpers
     {
         public static string ReadText(string filePath)
         {
+            string content = string.Empty;
             try
             {
                 filePath = filePath.ToLower();
                 if (filePath.EndsWith(".pdf"))
                 {
-                    return DocNetPdfTextExtractor(filePath);
+                    content = DocNetPdfTextExtractor(filePath);
                 }
                 //else if (filePath.EndsWith(".txt"))
                 //{
@@ -26,19 +27,20 @@ namespace TextSeeker.Helpers
                 //}
                 else
                 {
-                    return Toxy.ParserFactory.CreateText(new Toxy.ParserContext(filePath)).Parse();
+                    content = Toxy.ParserFactory.CreateText(new Toxy.ParserContext(filePath)).Parse();
                 }
             }
-            catch (System.NotSupportedException ex)
+            catch (System.NotSupportedException)
             {
                 var textExtractor = new TikaOnDotNet.TextExtraction.TextExtractor();
                 var result = textExtractor.Extract(filePath);
-                return result.Text;
+                content = result.Text;
             }
             catch 
             {
-                return string.Empty; 
+                content = string.Empty; 
             }
+            return content.Trim();
         }
 
         static string DocNetPdfTextExtractor(string filePath)

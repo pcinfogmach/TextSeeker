@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using TextSeeker.Helpers;
 using TextSeeker.TreeModels;
 using TextSeeker.ViewModels;
@@ -45,7 +35,7 @@ namespace TextSeeker
 
         private void DeleteTreeItemButton_Click(object sender, RoutedEventArgs e)
         {
-            if (DirectoryTreeView.SelectedItem is TreeNode treeNode)
+            if (treeView.SelectedItem is TreeNode treeNode)
             {
                 treeNode.Parent.Children.Remove(treeNode);
             }
@@ -56,23 +46,14 @@ namespace TextSeeker
             await viewModel.SearchAsync();        
         }
 
-        private async void SearchTextBox_KeyDown(object sender, KeyEventArgs e)
+        private async void SearchTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter) { await viewModel.SearchAsync(); e.Handled = true; }
         }
 
-        private void SearchResultsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (SearchResultsDataGrid.SelectedItem is TreeNode node)
-            {
-                string content = TextExtractor.ReadText(node.Path);
-                WebView2Helpers.NavigateTostring(PreviewBrowser, content, viewModel.SearchTerm, false);
-            }
-        }
-
         private void FileItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (sender is DataGridCell cell && cell.Tag is FileTreeNode node)
+            if (sender is ListViewItem listViewItem && listViewItem.Tag is FileTreeNode node)
             {
                 try { System.Diagnostics.Process.Start(node.Path); }
                 catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -91,7 +72,7 @@ namespace TextSeeker
         {
             if (e.Key == Key.Enter)
             {
-                if (sender is DataGridCell cell && cell.Tag is FileTreeNode node)
+                if (sender is ListViewItem listViewItem && listViewItem.Tag is FileTreeNode node)
                 {
                     try { System.Diagnostics.Process.Start(node.Path); }
                     catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -104,6 +85,20 @@ namespace TextSeeker
                     e.Handled = true;
                 }
             }
+        }
+
+        private void ListViewItem_Selected(object sender, RoutedEventArgs e)
+        {
+            if (sender is ListViewItem listViewItem && listViewItem.Tag is FileTreeNode fileTreeNode)
+            {
+                string content = TextExtractor.ReadText(fileTreeNode.Path);
+                WebView2Helpers.NavigateTostring(PreviewBrowser, content, SearchTextBox.Text, false);
+            }
+        }
+
+        private void IndexMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            IndexMenuList.IsDropDownOpen = true;
         }
     }
 }

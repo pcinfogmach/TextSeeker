@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,27 +20,48 @@ namespace TextSeeker.ViewModels
         ObservableCollection<TreeNode> _searchResults = new ObservableCollection<TreeNode>();
         TreeNodeSerializer treeNodeSerializer = new TreeNodeSerializer();
         string _searchTerm;
-        string _searchButtonText = "🔍";
+        Visibility _searchButtonvisibilty = Visibility.Visible;
+        Visibility _stopButtonvisibilty = Visibility.Collapsed;
         bool _isSearchInProgress;
-        bool _isEnabled = true;
+        bool _searchIsEnabled = true;
+
         #endregion
 
         #region Properties
         public TreeNode RootTreeViewNode { get => _rootTreeViewNode; set { _rootTreeViewNode = value; OnPropertyChanged(nameof(RootTreeViewNode)); } }
         public ObservableCollection<TreeNode> SearchResults { get => _searchResults; set { _searchResults = value; OnPropertyChanged(nameof(SearchResults)); } }
         public string SearchTerm { get => _searchTerm; set { _searchTerm = value; OnPropertyChanged(nameof(SearchTerm)); } }
-        public string SearchButtonText { get => _searchButtonText; set { _searchButtonText = value; OnPropertyChanged(nameof(SearchButtonText)); } }
+        public Visibility SearchButtonvisibilty 
+        { 
+            get => _searchButtonvisibilty; 
+            set 
+            {
+                _searchButtonvisibilty = value;
+                if (value == Visibility.Visible) StopButtonvisibilty = Visibility.Collapsed;
+                OnPropertyChanged(nameof(SearchButtonvisibilty)); 
+            } 
+        }
+        public Visibility StopButtonvisibilty 
+        {
+            get => _stopButtonvisibilty; 
+            set 
+            {
+                _stopButtonvisibilty = value; 
+                if (value == Visibility.Visible) SearchButtonvisibilty = Visibility.Collapsed; 
+                OnPropertyChanged(nameof(StopButtonvisibilty)); 
+            }
+        }
         public bool IsSearchInProgress
         {
             get => _isSearchInProgress;
             set
             {
-                if (value == true) { SearchButtonText = "■"; } else { SearchButtonText = "🔍"; }
+                if (value == true) { StopButtonvisibilty = Visibility.Visible; } else { SearchButtonvisibilty = Visibility.Visible; }
                 _isSearchInProgress = value; OnPropertyChanged(nameof(IsSearchInProgress));
             }
         }
 
-        public bool IsEnabled { get => _isEnabled; set { _isEnabled = value; OnPropertyChanged(nameof(IsEnabled)); } }
+        public bool SearchIsEnabled { get => _searchIsEnabled; set { _searchIsEnabled = value; OnPropertyChanged(nameof(SearchIsEnabled)); } }
 
 
         public CancellationTokenSource searchCancellationTokenSource;
@@ -53,10 +75,12 @@ namespace TextSeeker.ViewModels
 
         public void AddNewNode()
         {
-            string folderPath = FolderPickerLauncher.SelectedFolder("בחר תיקייה");
-            if (!string.IsNullOrEmpty(folderPath))
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                TreeBuilder.AddTreeNode(folderPath, RootTreeViewNode);
+                TreeBuilder.AddTreeNode(dialog.FileName, RootTreeViewNode); ;
             }
         }
 
@@ -89,7 +113,7 @@ namespace TextSeeker.ViewModels
                 {
                     if (searchCancellationToken.IsCancellationRequested)
                     {
-                        IsEnabled = false; //temporarily disable search controls till search actually stops
+                        SearchIsEnabled = false; //temporarily disable search controls till search actually stops
                         loopState.Stop();
                     }
 
@@ -100,8 +124,9 @@ namespace TextSeeker.ViewModels
                 });
             }, searchCancellationToken);
 
-            IsEnabled = true;
+            SearchIsEnabled = true;
             IsSearchInProgress = false;
+            if (SearchResults.Count == 0) { MessageBox.Show("לא נמצאו תוצאות"); }
         }
 
         #endregion
