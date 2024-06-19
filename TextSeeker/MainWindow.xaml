@@ -8,10 +8,11 @@
          xmlns:webView="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         FontFamily="Segoe UI Semilight"
         FontSize="14"
-        Background="WhiteSmoke"
+        Background="#FFF3F3F3"
         FlowDirection="RightToLeft"
         Height="450" Width="800"
-         FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}">
+        FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}"
+        Closing="Window_Closing">
     <Grid Margin="5" FlowDirection="LeftToRight">
         <Grid.Resources>
             <Style TargetType="Button">
@@ -26,6 +27,16 @@
                 <Setter Property="FlowDirection" Value="LeftToRight"/>
                 <Setter Property="Padding" Value="3"/>
             </Style>
+            <!--<Style TargetType="ListViewItem">
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="LightGray"/>
+                    </Trigger>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="LightGray"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>-->
             <Style TargetType="Image">
                 <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
                 <Setter Property="Height" Value="20"/>
@@ -36,7 +47,7 @@
             </Style>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="5"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -90,35 +101,36 @@
                 <Button x:Name="RemoveTreeItem" Click="DeleteTreeItemButton_Click">
                     <Image Source="/Resources/DeleteFolderIcon.png" />
                 </Button>
-                <Grid x:Name="IndexMenu" ToolTip="אינדקס">
-                    <ComboBox Height="0" x:Name="IndexMenuList">
-                        <ComboBoxItem Content="צור אינדקס חדש"/>
-                        <ComboBoxItem Content="עדכן אינדקס"/>
-                        <ComboBoxItem Content="מחק אינדקס"/>
-                    </ComboBox>
-                    <Button x:Name="IndexMenuButton" Click="IndexMenuButton_Click">
-                        <Image Source="/Resources/DataBaseImport.png" Height="18"/>
-                    </Button>
-                </Grid>
-                <ToggleButton x:Name="IndexedSearch">
+                <ToggleButton x:Name="IndexedSearchToggle" ToolTip="חיפוש באינדקס" IsChecked="{Binding IsIndexSearch}">
                     <Image Source="/Resources/SearchDataBase.png" Height="18"/>
                 </ToggleButton>
+                <!--<Grid x:Name="IndexMenu" Visibility="{Binding IndexOptionsVisiblity}">
+                    <ComboBox Width="0" x:Name="IndexMenuList" HorizontalAlignment="Left">
+                        <ComboBoxItem x:Name="NewIndexComboBoxItem" Content="צור אינדקס חדש"/>
+                        <ComboBoxItem x:Name="DeleteIndexComboBoxItem" Content="מחק את האינדקס"/>
+                    </ComboBox>
+                    <Button x:Name="IndexMenuButton"  ToolTip="אפשרויות אינדקס"
+                            Click="IndexMenuButton_Click">
+                        <Image Source="/Resources/DataBaseImport.png" Height="18"/>
+                    </Button>
+                </Grid>-->
+               
             </StackPanel>
 
-            <TreeView x:Name="treeView" Grid.Row="1" ItemsSource="{Binding RootTreeViewNode.Children}">
+            <TreeView x:Name="treeView" Grid.Row="1" ItemsSource="{Binding CurrentRootTreeViewNode.Children}">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type treeItems:FolderTreeNode}" ItemsSource="{Binding Children, Mode=TwoWay}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📁" FontSize="14" LineStackingStrategy="BlockLineHeight" LineHeight="15"/>
-                            <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" />
-                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock Text="📁" FontSize="14" LineStackingStrategy="BlockLineHeight" LineHeight="15" VerticalAlignment="Center"/>
+                            <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type treeItems:FileTreeNode}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🗎"  FontSize="16" LineStackingStrategy="BlockLineHeight" LineHeight="17"/>
-                            <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" />
-                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock Text="🗎"  FontSize="16" LineStackingStrategy="BlockLineHeight" LineHeight="17" VerticalAlignment="Center"/>
+                            <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </DataTemplate>
                     <Style TargetType="TreeViewItem">

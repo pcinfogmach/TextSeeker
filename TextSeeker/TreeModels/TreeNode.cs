@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using com.sun.org.apache.bcel.@internal.generic;
+using Newtonsoft.Json;
+using org.bouncycastle.mail.smime.examples;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,15 +10,8 @@ using System.Xml.Serialization;
 
 namespace TextSeeker
 {
-    public class FolderTreeNode : TreeNode
-    {
-        public FolderTreeNode(string path) : base(path) { }
-    }
-
-    public class FileTreeNode : TreeNode
-    {
-        public FileTreeNode(string path) : base(path) { }
-    }
+    public class FolderTreeNode : TreeNode  {    public FolderTreeNode(string path) : base(path) { } }
+    public class FileTreeNode : TreeNode {  public FileTreeNode(string path) : base(path) { } }
     public class TreeNode : INotifyBase
     {
         private string _name;
@@ -28,7 +23,8 @@ namespace TextSeeker
         private bool? _isChecked = true;
 
         public TreeNode(string path)
-        {
+        {   
+            if (string.IsNullOrWhiteSpace(path)) { return; }
             _path = path;
             _directory = System.IO.Path.GetDirectoryName(path);
             _name = System.IO.Path.GetFileName(path);
@@ -159,6 +155,37 @@ namespace TextSeeker
                 if (allChecked) { Parent.IsChecked = true; }
                 else if (allUnchecked) { Parent.IsChecked = false; }
                 else { Parent.IsChecked = null; }
+            }
+        }
+
+        public TreeNode HardCopy()
+        {
+            if (this is FileTreeNode) 
+            {
+                FileTreeNode treeNode = new FileTreeNode(Path);
+                foreach (var node in Children)
+                {
+                    treeNode.AddChild(node.HardCopy());
+                }
+                return treeNode;
+            }
+            else if (this is FolderTreeNode) 
+            {
+                FolderTreeNode treeNode = new FolderTreeNode(Path);
+                foreach (var node in Children)
+                {
+                    treeNode.AddChild(node.HardCopy());
+                }
+                return treeNode;
+            }
+            else
+            {
+                TreeNode treeNode = new TreeNode(Path);
+                foreach (var node in Children)
+                {
+                    treeNode.AddChild(node.HardCopy());
+                }
+                return treeNode;
             }
         }
     }

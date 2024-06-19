@@ -5,6 +5,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using TextSeeker.Helpers;
+using TextSeeker.SearchModels;
 using TextSeeker.TreeModels;
 using TextSeeker.ViewModels;
 
@@ -25,7 +26,10 @@ namespace TextSeeker
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             TreeNodeSerializer serializer = new TreeNodeSerializer();
-            serializer.SaveToFile(viewModel.RootTreeViewNode);
+            serializer.JsonFilePath = "TextSeekerTreeNodes.json";
+            serializer.SaveToFile(viewModel.UnIndexedRootTreeViewNode);
+            serializer.JsonFilePath = "TextSeekerIndexedTreeNodes.json";
+            serializer.SaveToFile(viewModel.IndexedRootTreeViewNode);
         }
 
         private void AddTreeItemButton_Click(object sender, RoutedEventArgs e)
@@ -38,6 +42,11 @@ namespace TextSeeker
             if (treeView.SelectedItem is TreeNode treeNode)
             {
                 treeNode.Parent.Children.Remove(treeNode);
+                if (viewModel.IsIndexSearch == true)
+                {
+                    LuceneSearch luceneSearch = new LuceneSearch();
+                    luceneSearch.RemoveFiles(TreeHelper.GetAllFileNodes(treeNode));
+                }
             }
         }
 
@@ -89,16 +98,16 @@ namespace TextSeeker
 
         private void ListViewItem_Selected(object sender, RoutedEventArgs e)
         {
-            if (sender is ListViewItem listViewItem && listViewItem.Tag is FileTreeNode fileTreeNode)
+            if (sender is ListViewItem listViewItem && listViewItem.DataContext is FileTreeNode fileTreeNode)
             {
                 string content = TextExtractor.ReadText(fileTreeNode.Path);
                 WebView2Helpers.NavigateTostring(PreviewBrowser, content, SearchTextBox.Text, false);
             }
         }
 
-        private void IndexMenuButton_Click(object sender, RoutedEventArgs e)
-        {
-            IndexMenuList.IsDropDownOpen = true;
-        }
+        //private void IndexMenuButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    IndexMenuList.IsDropDownOpen = true;
+        //}
     }
 }

@@ -19,7 +19,7 @@ namespace TextSeeker.SearchModels
     {
         public enum SearchType { ContainsSearch, LooseSearch, RegexSearch, TamperedRegexSearch}
 
-        public static bool Search(FileTreeNode file, string searchTerm, SearchType searchType, CancellationToken cancellationToken)
+        public static bool Search(TreeNode file, string searchTerm, SearchType searchType, CancellationToken cancellationToken)
         {
             if ((file.Path.ToLower().EndsWith(".pdf") && PdfTextSearch(file.Path, searchTerm, searchType, cancellationToken)) ||
                 IsSearchMatch(TextExtractor.ReadText(file.Path), searchTerm, searchType))

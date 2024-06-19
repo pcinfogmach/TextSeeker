@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System;   
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,17 +8,17 @@ namespace TextSeeker.TreeModels
 {
     internal class TreeHelper
     {
-        public static List<FileTreeNode> GetCheckedFileNodes(TreeNode rootNode)
+        public static List<TreeNode> GetCheckedFileNodes(TreeNode rootNode)
         {
-            List<FileTreeNode> checkedFileNodes = new List<FileTreeNode>();
+            List<TreeNode> checkedFileNodes = new List<TreeNode>();
             foreach (var treeNode in rootNode.Children)
             {
-                TraverseTree(treeNode, ref checkedFileNodes);
+                TraverseCheckedTreeNodes(treeNode, ref checkedFileNodes);
             }
             return checkedFileNodes;
         }
 
-        private static void TraverseTree(TreeNode node, ref List<FileTreeNode> checkedFileNodes)
+        private static void TraverseCheckedTreeNodes(TreeNode node, ref List<TreeNode> checkedFileNodes)
         {
             if (node.IsChecked == true)
             {
@@ -30,11 +30,28 @@ namespace TextSeeker.TreeModels
                 {
                     foreach (var childNode in node.Children)
                     {
-                        TraverseTree(childNode, ref checkedFileNodes);
+                        TraverseCheckedTreeNodes(childNode, ref checkedFileNodes);
                     }
                 }
                
             }          
+        }
+
+        public static List<string> GetAllFileNodes(TreeNode rootNode)
+        {
+            List<string> files = new List<string>();
+            foreach (var treeNode in rootNode.Children)
+            {
+                if (treeNode is FolderTreeNode folderTreeNode) 
+                {
+                    files.AddRange(System.IO.Directory.GetFiles(folderTreeNode.Path, "*.*", System.IO.SearchOption.AllDirectories));
+                }
+                else if (treeNode is FileTreeNode fileTreeNode)
+                { 
+                    files.Add(treeNode.Path); 
+                }              
+            }
+            return files;
         }
     }
 }

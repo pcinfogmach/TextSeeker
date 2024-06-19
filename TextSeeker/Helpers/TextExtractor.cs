@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using org.apache.tika;
 using com.sun.tools.doclets.formats.html;
+using System;
 
 namespace TextSeeker.Helpers
 {
@@ -36,7 +37,7 @@ namespace TextSeeker.Helpers
                 var result = textExtractor.Extract(filePath);
                 content = result.Text;
             }
-            catch 
+            catch (Exception ex)
             {
                 content = string.Empty; 
             }

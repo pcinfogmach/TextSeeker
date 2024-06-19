@@ -6,10 +6,11 @@ namespace TextSeeker.TreeModels
 {
     internal class TreeNodeSerializer
     {
-        string jsonFilePath;
-        public TreeNodeSerializer()
+        string _jsonFilePath;
+        public string JsonFilePath
         {
-            jsonFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeekerTreeNodes.json");
+            get { return _jsonFilePath; }
+            set {  _jsonFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeeker", value); }
         }
 
         public void SaveToFile(TreeNode rootnode)
@@ -21,15 +22,15 @@ namespace TextSeeker.TreeModels
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 Formatting = Formatting.Indented
             });
-            File.WriteAllText(jsonFilePath, jsonText);
+            File.WriteAllText(JsonFilePath, jsonText);
         }
 
         public TreeNode LoadFromFile()
         {
-            if (!File.Exists(jsonFilePath)) { return new TreeNode(null); }
+            if (!File.Exists(JsonFilePath)) { return new TreeNode(null); }
             else
             {
-                string jsonText = File.ReadAllText(jsonFilePath);
+                string jsonText = File.ReadAllText(JsonFilePath);
                 TreeNode rootNode = JsonConvert.DeserializeObject<TreeNode>(jsonText, new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Auto,

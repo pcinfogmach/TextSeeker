@@ -15,7 +15,7 @@ namespace TextSeeker.Helpers
 
             webView2.Visibility = System.Windows.Visibility.Collapsed;
 
-            string htmlFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeekerTextPreview.html");
+            string htmlFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeeker", "TextSeekerTextPreview.html");
             File.WriteAllText(htmlFilePath, input);
             webView2.Dispatcher.Invoke(() =>
             {
