@@ -32,7 +32,7 @@ namespace TextSeeker.ViewModels
         bool _isIndexSearch;
         Visibility _indexOptionsVisiblity = Visibility.Collapsed;
         LuceneSearch luceneSearch = new LuceneSearch();
-        public CancellationTokenSource searchCancellationTokenSource;
+        public CancellationTokenSource searchCancellationTokenSource = new CancellationTokenSource();
 
         #endregion
 
@@ -42,24 +42,24 @@ namespace TextSeeker.ViewModels
         public TreeNode IndexedRootTreeViewNode { get => _indexedRootTreeViewNode; set { _indexedRootTreeViewNode = value; OnPropertyChanged(nameof(IndexedRootTreeViewNode)); } }
         public ObservableCollection<TreeNode> SearchResults { get => _searchResults; set { _searchResults = value; OnPropertyChanged(nameof(SearchResults)); } }
         public string SearchTerm { get => _searchTerm; set { _searchTerm = value; OnPropertyChanged(nameof(SearchTerm)); } }
-        public Visibility SearchButtonvisibilty 
-        { 
-            get => _searchButtonvisibilty; 
-            set 
+        public Visibility SearchButtonvisibilty
+        {
+            get => _searchButtonvisibilty;
+            set
             {
                 _searchButtonvisibilty = value;
                 if (value == Visibility.Visible) StopButtonvisibilty = Visibility.Collapsed;
-                OnPropertyChanged(nameof(SearchButtonvisibilty)); 
-            } 
+                OnPropertyChanged(nameof(SearchButtonvisibilty));
+            }
         }
-        public Visibility StopButtonvisibilty 
+        public Visibility StopButtonvisibilty
         {
-            get => _stopButtonvisibilty; 
-            set 
+            get => _stopButtonvisibilty;
+            set
             {
-                _stopButtonvisibilty = value; 
-                if (value == Visibility.Visible) SearchButtonvisibilty = Visibility.Collapsed; 
-                OnPropertyChanged(nameof(StopButtonvisibilty)); 
+                _stopButtonvisibilty = value;
+                if (value == Visibility.Visible) SearchButtonvisibilty = Visibility.Collapsed;
+                OnPropertyChanged(nameof(StopButtonvisibilty));
             }
         }
         public bool IsSearchInProgress
@@ -73,25 +73,25 @@ namespace TextSeeker.ViewModels
         }
 
         public bool SearchIsEnabled { get => _searchIsEnabled; set { _searchIsEnabled = value; OnPropertyChanged(nameof(SearchIsEnabled)); } }
-        public bool IsIndexSearch 
+        public bool IsIndexSearch
         {
-            get => _isIndexSearch; 
-            set 
+            get => _isIndexSearch;
+            set
             {
-                if (value == true) 
+                if (value == true)
                 {
-                    PopulateIndex(); 
+                    PopulateIndex();
                     IndexOptionsVisiblity = Visibility.Visible;
                     CurrentRootTreeViewNode = IndexedRootTreeViewNode;
                 }
-                else 
-                { 
+                else
+                {
                     IndexOptionsVisiblity = Visibility.Collapsed;
                     CurrentRootTreeViewNode = UnIndexedRootTreeViewNode;
                 }
-                _isIndexSearch = value; 
-                OnPropertyChanged(nameof(IsIndexSearch)); 
-            } 
+                _isIndexSearch = value;
+                OnPropertyChanged(nameof(IsIndexSearch));
+            }
         }
 
         public Visibility IndexOptionsVisiblity
@@ -105,7 +105,7 @@ namespace TextSeeker.ViewModels
         }
 
 
-       
+
         #endregion
 
         #region Methods
@@ -116,22 +116,30 @@ namespace TextSeeker.ViewModels
             CurrentRootTreeViewNode = UnIndexedRootTreeViewNode;
             treeNodeSerializer.JsonFilePath = "TextSeekerIndexedTreeNodes.json";
             IndexedRootTreeViewNode = treeNodeSerializer.LoadFromFile();
+            IsIndexSearch = Properties.Settings.Default.IsIndexedSearch;
         }
 
-        public void AddNewNode()
+        public async void AddNewNode()
         {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
             dialog.IsFolderPicker = true;
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                TreeBuilder.AddTreeNode(dialog.FileName, CurrentRootTreeViewNode);
                 if (CurrentRootTreeViewNode == IndexedRootTreeViewNode)
                 {
+                    IsSearchInProgress = true;
+                    SearchIsEnabled = false;
                     List<string> files = System.IO.Directory.GetFiles(dialog.FileName, "*.*", System.IO.SearchOption.AllDirectories).ToList();
-                    luceneSearch.IndexFiles(files);
+                    await Task.Run(() =>
+                    {
+                        luceneSearch.IndexFiles(files);
+                    });
+                    IsSearchInProgress = false;
+                    SearchIsEnabled = true;
                 }
-            }        
+                TreeBuilder.AddTreeNode(dialog.FileName, CurrentRootTreeViewNode);
+            }
         }
 
         public List<TreeNode> GetCheckedFileNodes()
@@ -139,7 +147,7 @@ namespace TextSeeker.ViewModels
             return TreeHelper.GetCheckedFileNodes(CurrentRootTreeViewNode);
         }
 
-        void PopulateIndex()
+        async void PopulateIndex()
         {
             if (IndexedRootTreeViewNode.Children.Count <= 0 && CurrentRootTreeViewNode.Children.Count > 0)
             {
@@ -151,7 +159,10 @@ namespace TextSeeker.ViewModels
                     IsSearchInProgress = true;
                     IndexedRootTreeViewNode = CurrentRootTreeViewNode.HardCopy();
                     List<string> files = TreeHelper.GetAllFileNodes(IndexedRootTreeViewNode);
-                    luceneSearch.IndexFiles(files);
+                    await Task.Run(() =>
+                    {
+                        luceneSearch.IndexFiles(files);
+                    });
                     IsSearchInProgress = false;
                 }
             }
@@ -162,50 +173,60 @@ namespace TextSeeker.ViewModels
             if (IsSearchInProgress) { searchCancellationTokenSource.Cancel(); return; }
             if (string.IsNullOrEmpty(SearchTerm)) { MessageBox.Show("אנא הזן טקסט לחיפוש"); return; }
 
-            searchCancellationTokenSource = new CancellationTokenSource();
-            CancellationToken searchCancellationToken = searchCancellationTokenSource.Token;
             IsSearchInProgress = true; //also turns on the progress bar
 
             List<TreeNode> files = await Task.Run(() =>
             {
                 return TreeHelper.GetCheckedFileNodes(CurrentRootTreeViewNode);
             });
-            
-            if (IsIndexSearch) 
+
+            SearchResults.Clear();
+
+            if (IsIndexSearch)
             {
                 SearchResults = await Task.Run(() =>
                 {
                     return new ObservableCollection<TreeNode>(luceneSearch.Search(SearchTerm, files));
                 });
-            } 
+            }
             else
             {
-                string searchText = SearchTerm;//added this variable in order to avoid a case where search term changes in the middle of a search  
-
-                SearchResults.Clear();
-
-                // Process the files in parallel
-                await Task.Run(() =>
-                {
-                    Parallel.ForEach(files, (file, loopState) =>
-                    {
-                        if (searchCancellationToken.IsCancellationRequested)
-                        {
-                            SearchIsEnabled = false; //temporarily disable search controls till search actually stops
-                            loopState.Stop();
-                        }
-
-                        if (SearchModel.Search(file, searchText, SearchModel.SearchType.ContainsSearch, searchCancellationToken))
-                        {
-                            Application.Current.Dispatcher.Invoke(() => { SearchResults.Add(file); });
-                        }
-                    });
-                }, searchCancellationToken);
+                await Task.Run(() => { FullTextSearch(files); });
             }
 
-            SearchIsEnabled = true;
             IsSearchInProgress = false;
             if (SearchResults.Count == 0) { MessageBox.Show("לא נמצאו תוצאות"); }
+        }
+
+        void FullTextSearch(List<TreeNode> files)
+        {
+            searchCancellationTokenSource = new CancellationTokenSource();
+            CancellationToken searchCancellationToken = searchCancellationTokenSource.Token;
+
+            string searchText = SearchTerm;//added this variable in order to avoid a case where search term changes in the middle of a search            
+
+            Parallel.ForEach(files, (file, loopState) =>
+            {
+                if (searchCancellationToken.IsCancellationRequested)
+                {
+                    SearchIsEnabled = false; //temporarily disable search controls till search actually stops
+                    loopState.Stop();
+                }
+
+                var tuple = new InMemoryLuceneSearch().Execute(file.Path, searchText);
+                if (tuple.Item1)
+                {
+                    file.searchScore = tuple.Item2;
+                    Application.Current.Dispatcher.Invoke(() => { SearchResults.Add(file);});
+                }
+                //if (SearchModel.Search(file, searchText, SearchModel.SearchType.ContainsSearch, searchCancellationToken))
+                //{
+                //    Application.Current.Dispatcher.Invoke(() => { SearchResults.Add(file); });
+                //}
+            });
+
+            //SearchResults.OrderByDescending(f => f.searchScore);
+            SearchIsEnabled = true;
         }
 
         public void SortSearchResults(bool ascending = true)

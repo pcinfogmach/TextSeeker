@@ -17,6 +17,7 @@ namespace TextSeeker
     public partial class MainWindow : Window
     {
         TextSeekerViewModel viewModel = new TextSeekerViewModel();
+        string currentSearchTerm;
         public MainWindow()
         {
             InitializeComponent();
@@ -30,6 +31,8 @@ namespace TextSeeker
             serializer.SaveToFile(viewModel.UnIndexedRootTreeViewNode);
             serializer.JsonFilePath = "TextSeekerIndexedTreeNodes.json";
             serializer.SaveToFile(viewModel.IndexedRootTreeViewNode);
+            Properties.Settings.Default.IsIndexedSearch = viewModel.IsIndexSearch;
+            Properties.Settings.Default.Save();
         }
 
         private void AddTreeItemButton_Click(object sender, RoutedEventArgs e)
@@ -37,7 +40,17 @@ namespace TextSeeker
             viewModel.AddNewNode(); 
         }
 
+        private void treeView_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete) { DeleteTreeItem(); }
+        }
+
         private void DeleteTreeItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteTreeItem();
+        }
+
+        void DeleteTreeItem()
         {
             if (treeView.SelectedItem is TreeNode treeNode)
             {
@@ -50,14 +63,20 @@ namespace TextSeeker
             }
         }
 
-        private async void SearchButton_Click(object sender, RoutedEventArgs e)
+        private  void SearchButton_Click(object sender, RoutedEventArgs e)
         {
-            await viewModel.SearchAsync();        
+            Search();
         }
 
-        private async void SearchTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        private  void SearchTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter) { await viewModel.SearchAsync(); e.Handled = true; }
+            if (e.Key == Key.Enter) { Search(); e.Handled = true; }
+        }
+
+        async void Search()
+        {
+            currentSearchTerm = SearchTextBox.Text;
+            await viewModel.SearchAsync();
         }
 
         private void FileItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -101,7 +120,7 @@ namespace TextSeeker
             if (sender is ListViewItem listViewItem && listViewItem.DataContext is FileTreeNode fileTreeNode)
             {
                 string content = TextExtractor.ReadText(fileTreeNode.Path);
-                WebView2Helpers.NavigateTostring(PreviewBrowser, content, SearchTextBox.Text, false);
+                WebView2Helpers.NavigateTostring(PreviewBrowser, content, currentSearchTerm, false);
             }
         }
 

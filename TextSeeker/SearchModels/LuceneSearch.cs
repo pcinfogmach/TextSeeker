@@ -1,17 +1,19 @@
 ﻿using Lucene.Net.Analysis;
-using Lucene.Net.Index;
-using Lucene.Net.Store;
+using Lucene.Net.Analysis.Core;
+using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
-using System;
-using System.IO;
-using TextSeeker.Helpers;
+using Lucene.Net.Index;
+using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
+using Lucene.Net.Store;
+using Lucene.Net.Util;
+using System;
 using System.Collections.Generic;
-using Lucene.Net.QueryParsers;
+using System.IO;
 using System.Linq;
-using com.drew.metadata;
-using sun.swing;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TextSeeker.Helpers;
 
 namespace TextSeeker.SearchModels
 {
@@ -19,70 +21,84 @@ namespace TextSeeker.SearchModels
     {
         string indexPath;
         Analyzer analyzer;
+
         public LuceneSearch()
         {
             indexPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeeker", "TextSeekerIndex");
-            if(!System.IO.Directory.Exists(indexPath)) { System.IO.Directory.CreateDirectory(indexPath); }
-            analyzer = new WhitespaceAnalyzer();
+            if (!System.IO.Directory.Exists(indexPath))
+            {
+                System.IO.Directory.CreateDirectory(indexPath);
+            }
+            analyzer = new HebrewAnalyzer(LuceneVersion.LUCENE_48);
         }
 
-        public async void IndexFiles(List<string> files)
+        public void IndexFiles(List<string> files)
         {
-            await Task.Run(() =>
+            using (var directory = FSDirectory.Open(new DirectoryInfo(indexPath)))
             {
-                using (var directory = FSDirectory.Open(new DirectoryInfo(indexPath)))
-                using (var writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
+                var indexConfig = new IndexWriterConfig(LuceneVersion.LUCENE_48, analyzer);
+                using (var writer = new IndexWriter(directory, indexConfig))
                 {
-                   
                     foreach (string file in files)
                     {
                         string content = TextExtractor.ReadText(file);
-                        var doc = new Document();
-                        doc.Add(new Field("Path", file, Field.Store.YES, Field.Index.ANALYZED));
-                        //doc.Add(new Field("DateModified", File.GetLastWriteTime(file).ToString(), Field.Store.YES, Field.Index.NO));
-                        doc.Add(new Field("Content", content, Field.Store.YES, Field.Index.ANALYZED));
-                        writer.AddDocument(doc);
+                        var doc = new Document
+                        {
+                            new StringField("Path", file, Field.Store.YES),
+                            new TextField("Content", content, Field.Store.YES)
+                        };
+
+                        // Create a term to search for the existing document by its path
+                        var term = new Term("Path", file);
+
+                        // Update the document if it exists, otherwise add it
+                        writer.UpdateDocument(term, doc);
                     }
-                    writer.Optimize();
-                    writer.Commit();
+
+                    writer.Flush(triggerMerge: true, applyAllDeletes: true);
                 }
-            });
+            }
         }
 
-        public void RemoveFiles(List<string> files) 
+        public void RemoveFiles(List<string> files)
         {
             using (var directory = FSDirectory.Open(new DirectoryInfo(indexPath)))
-            using (var writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
             {
-                var parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, "Path", analyzer);
-                parser.AllowLeadingWildcard = true;
-                foreach (string file in files)
+                var indexConfig = new IndexWriterConfig(Lucene.Net.Util.LuceneVersion.LUCENE_48, analyzer);
+                using (var writer = new IndexWriter(directory, indexConfig))
                 {
-                    Query query = parser.Parse(file);
-                    writer.DeleteDocuments(query);
+                    var parser = new QueryParser(Lucene.Net.Util.LuceneVersion.LUCENE_48, "Path", analyzer);
+
+                    foreach (string file in files)
+                    {
+                        Query query = parser.Parse(file);
+                        writer.DeleteDocuments(query);
+                    }
+                    writer.Flush(triggerMerge: false, applyAllDeletes: false);
                 }
-                writer.Commit();
             }
         }
 
         public List<TreeNode> Search(string queryText, List<TreeNode> checkedTreeNodes)
         {
             using (var directory = FSDirectory.Open(new DirectoryInfo(indexPath)))
-            using (var searcher = new IndexSearcher(directory, true))
             {
-                var parser = new QueryParser(Lucene.Net.Util.Version.LUCENE_30, "Content", analyzer);
+                var searcher = new IndexSearcher(DirectoryReader.Open(directory));
+                var parser = new CostumeQueryParser(Lucene.Net.Util.LuceneVersion.LUCENE_48, "Content", analyzer);
+
                 var query = parser.Parse(queryText);
 
-                var scoreDocs = searcher.Search(query, int.MaxValue).ScoreDocs;
-
+                var topDocs = searcher.Search(query, int.MaxValue);
                 List<TreeNode> results = new List<TreeNode>();
-                foreach (var scoreDoc in scoreDocs)
+
+                foreach (var scoreDoc in topDocs.ScoreDocs)
                 {
                     var path = searcher.Doc(scoreDoc.Doc).Get("Path");
-                    results.Add(checkedTreeNodes.FirstOrDefault(node => node.Path ==  path));
+                    results.Add(checkedTreeNodes.FirstOrDefault(node => node.Path == path));
                 }
                 return results;
             }
+
         }
     }
 }

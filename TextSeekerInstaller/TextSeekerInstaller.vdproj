@@ -1713,6 +1713,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_9EBC9828A582C08CCC54CE733D49EC69"
+        "OwnerKey" = "8:_D07D67162A714403A5EFD2B3A03885C1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9F1668C416E2B9DA28D234FBAB615FE5"
         "OwnerKey" = "8:_D07D67162A714403A5EFD2B3A03885C1"
         "MsmSig" = "8:_UNDEFINED"
@@ -2835,12 +2841,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_E1AD6066BE11B7A94100688EB1425902"
-        "OwnerKey" = "8:_D07D67162A714403A5EFD2B3A03885C1"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_E1ED2FA43D6B74F110A38D0411650C17"
         "OwnerKey" = "8:_D07D67162A714403A5EFD2B3A03885C1"
         "MsmSig" = "8:_UNDEFINED"
@@ -3244,12 +3244,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_E1AD6066BE11B7A94100688EB1425902"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_9A20FA3FD22E7AD655638B34D7E650DF"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -3479,6 +3473,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_6BE06F0D0864DDEE98F8929B15B88656"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9EBC9828A582C08CCC54CE733D49EC69"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -4280,6 +4280,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -4304,6 +4312,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -8260,6 +8276,37 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9EBC9828A582C08CCC54CE733D49EC69"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:GongSolutions.WPF.DragDrop, Version=3.0.0.0, Culture=neutral, PublicKeyToken=91f1945125b7a587, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_9EBC9828A582C08CCC54CE733D49EC69"
+                    {
+                    "Name" = "8:GongSolutions.WPF.DragDrop.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:GongSolutions.WPF.DragDrop.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_8BA27A1F2F434B04B4EC5B604C969804"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9F1668C416E2B9DA28D234FBAB615FE5"
             {
             "AssemblyRegister" = "3:1"
@@ -10275,32 +10322,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E1AD6066BE11B7A94100688EB1425902"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:LiteDB, Version=5.0.20.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                }
-            "SourcePath" = "8:LiteDB.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_8BA27A1F2F434B04B4EC5B604C969804"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E1ED2FA43D6B74F110A38D0411650C17"
             {
             "AssemblyRegister" = "3:1"
@@ -11163,15 +11184,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TextSeeker"
-        "ProductCode" = "8:{08FCE26F-FAF4-4DC3-A28F-F8BABDBB196C}"
-        "PackageCode" = "8:{C7124608-B161-4BB9-94CF-2A3F61388627}"
+        "ProductCode" = "8:{1FE58443-094F-4706-8F19-64B2C1C24531}"
+        "PackageCode" = "8:{E130E56F-08A6-4098-8D3E-9E40CE273775}"
         "UpgradeCode" = "8:{1053A10D-C984-4128-A8D1-F364FA310D0C}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:TRUE"
+        "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:1.0.1"
         "Manufacturer" = "8:PcInfoGmach"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

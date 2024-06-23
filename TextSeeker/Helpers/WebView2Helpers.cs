@@ -10,30 +10,58 @@ namespace TextSeeker.Helpers
         public static void NavigateTostring(WebView2 webView2, string input, string searchTerm, bool isRegexPattern)
         {
             if(!isRegexPattern) { Regex.Escape(input); }
-            input = Regex.Replace(input, $"({searchTerm})", @"<mark>$1</mark>");
-            var visiblity = webView2.Visibility;
-
-            webView2.Visibility = System.Windows.Visibility.Collapsed;
+            input = CreateHtmlPage(input, searchTerm);
 
             string htmlFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeeker", "TextSeekerTextPreview.html");
             File.WriteAllText(htmlFilePath, input);
+            
             webView2.Dispatcher.Invoke(() =>
             {
                 webView2.Source = new Uri("about:blank");
                 webView2.Source = new Uri(htmlFilePath);
             });
+        }
 
-            webView2.NavigationCompleted += async (s, e) =>
+        static string CreateHtmlPage(string input, string searchTerm)
+        {
+            return $@"<!DOCTYPE html>
+<html lang=""he"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>RTL Justified Text Example</title>
+    <style>
+        .container {{
+            margin: 0 auto; /* Center the content */
+            text-align: justify; /* Justify the text */
+        }}
+    </style>
+</head>
+<body dir=""auto"">
+    <div class=""container"">
+      {Highlight(input, searchTerm)}
+    </div>
+</body>
+<script>
+ window.find('{searchTerm}')
+</script>
+</html>
+";
+        }
+
+        static string Highlight(string input, string searchTerm)
+        {
+            string escapedTerm = Regex.Escape(searchTerm);
+            string wildcardPattern = escapedTerm
+                   .Replace("\\*", "[א-ת\"]+")
+                   .Replace("\\?", ".");
+
+            string[] searchTerms = searchTerm.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string term in searchTerms)
             {
-                string script = $@"
-                        document.documentElement.style.direction = 'rtl';
-                        document.documentElement.style.textAlign = 'justify';
-                        document.documentElement.style.margin = '10px';
-                        window.find('{searchTerm}')
-                    ";
-                await webView2.CoreWebView2.ExecuteScriptAsync(script);
-                webView2.Visibility = visiblity;
-            };
+                input = Regex.Replace(input, wildcardPattern, $"<mark>$&</mark>", RegexOptions.IgnoreCase);
+            }
+            return input;
         }
     }
 }

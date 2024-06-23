@@ -12,6 +12,8 @@ using TextSeeker.Helpers;
 using TextSeeker.Models;
 using TextSeeker.ViewModels;
 using System.Threading;
+using javax.naming.directory;
+using System.Collections.ObjectModel;
 
 namespace TextSeeker.SearchModels
 {

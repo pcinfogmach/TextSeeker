@@ -3,6 +3,7 @@
          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
          xmlns:treeItems="clr-namespace:TextSeeker"
          xmlns:helpers="clr-namespace:TextSeeker.Helpers"
          xmlns:webView="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
@@ -13,19 +14,42 @@
         Height="450" Width="800"
         FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}"
         Closing="Window_Closing">
+    
     <Grid Margin="5" FlowDirection="LeftToRight">
         <Grid.Resources>
+            <Style TargetType="Border">
+                <Setter Property="CornerRadius" Value="3"/>
+                <Setter Property="BorderBrush" Value="LightGray"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="1"/>
+            </Style>
             <Style TargetType="Button">
+                <Style.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightGray"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="LightGray"/>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="1"/>
+                    </Style>
+                </Style.Resources>
                 <Setter Property="Background" Value="{x:Null}"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="FlowDirection" Value="LeftToRight"/>
                 <Setter Property="Padding" Value="3"/>
+                <Setter Property="Padding" Value="1"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
             </Style>
             <Style TargetType="ToggleButton">
+                <Style.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="1"/>
+                    </Style>
+                </Style.Resources>
                 <Setter Property="Background" Value="{x:Null}"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="FlowDirection" Value="LeftToRight"/>
                 <Setter Property="Padding" Value="3"/>
+                <Setter Property="Padding" Value="1"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
             </Style>
             <!--<Style TargetType="ListViewItem">
                 <Style.Triggers>
@@ -57,28 +81,27 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel  Grid.Row="0" Grid.ColumnSpan="3" >
-            <Border  x:Name="SearchPanel" IsEnabled="{Binding SearchIsEnabled}"
+        <Border  x:Name="SearchPanel" IsEnabled="{Binding SearchIsEnabled}"
+                 Grid.Row="0" Grid.ColumnSpan="3" 
                  BorderBrush="LightGray" BorderThickness="1"
                  Background="White">
-                <Grid>
-                    <TextBox x:Name="SearchTextBox" BorderThickness="0" VerticalAlignment="Center" Margin="2,0,2,0"
+            <Grid>
+                <TextBox x:Name="SearchTextBox" BorderThickness="0" VerticalAlignment="Center" Margin="2,0,2,0"
                              Text="{Binding SearchTerm , UpdateSourceTrigger=PropertyChanged, BindsDirectlyToSource=True}" 
                              PreviewKeyDown="SearchTextBox_PreviewKeyDown"
                              FlowDirection="RightToLeft"/>
-                    <Grid HorizontalAlignment="Left">
-                        <Button x:Name="StopSearchButton" Width="25" Visibility="{Binding StopButtonvisibilty}"
+                <Grid HorizontalAlignment="Left">
+                    <Button x:Name="StopSearchButton" Width="25" Visibility="{Binding StopButtonvisibilty}"
                              Click="SearchButton_Click">
-                            <TextBlock Text="■" FontSize="12" VerticalAlignment="Center"/>
-                        </Button>
-                        <Button x:Name="SearchButton" Visibility="{Binding SearchButtonvisibilty}"
+                        <TextBlock Text="■" FontSize="12" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button x:Name="SearchButton" Visibility="{Binding SearchButtonvisibilty}"
                             Click="SearchButton_Click">
-                            <Image Source="/Resources/SearchIcon.png" Height="16"/>
-                        </Button>
-                    </Grid>
+                        <Image Source="/Resources/SearchIcon.png" Height="16"/>
+                    </Button>
                 </Grid>
-            </Border>
-        </StackPanel>
+            </Grid>
+        </Border>
 
         <ProgressBar x:Name="progressBar" Height="5" BorderThickness="0" Background="{x:Null}"
                IsIndeterminate="{Binding IsSearchInProgress}"
@@ -94,7 +117,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Orientation="Horizontal" Grid.Row="0"
-                        MinWidth="200">
+                        MinWidth="200" Margin="0,0,0,2">
                 <Button x:Name="AddTreeItem" Click="AddTreeItemButton_Click">
                     <Image Source="/Resources/AddFolderIcon.png" />
                 </Button>
@@ -117,53 +140,62 @@
                
             </StackPanel>
 
-            <TreeView x:Name="treeView" Grid.Row="1" ItemsSource="{Binding CurrentRootTreeViewNode.Children}">
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type treeItems:FolderTreeNode}" ItemsSource="{Binding Children, Mode=TwoWay}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="📁" FontSize="14" LineStackingStrategy="BlockLineHeight" LineHeight="15" VerticalAlignment="Center"/>
-                            <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type treeItems:FileTreeNode}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="🗎"  FontSize="16" LineStackingStrategy="BlockLineHeight" LineHeight="17" VerticalAlignment="Center"/>
-                            <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </DataTemplate>
-                    <Style TargetType="TreeViewItem">
-                        <EventSetter Event="MouseDoubleClick" Handler="FileItem_MouseDoubleClick"/>
-                        <EventSetter Event="PreviewKeyDown" Handler="FileItem_KeyDown"/>
-                        <Setter Property="Tag" Value="{Binding}"/>
-                    </Style>
-                </TreeView.Resources>
-            </TreeView>
+            <Border Grid.Row="1" Background="{Binding Background, ElementName=treeView}">
+                <TreeView x:Name="treeView" ItemsSource="{Binding CurrentRootTreeViewNode.Children}"
+                          dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
+             PreviewKeyDown="treeView_PreviewKeyDown"
+                          BorderThickness="0">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type treeItems:FolderTreeNode}" ItemsSource="{Binding Children, Mode=TwoWay}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📁" FontSize="14" LineStackingStrategy="BlockLineHeight" LineHeight="15" VerticalAlignment="Center"/>
+                                <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type treeItems:FileTreeNode}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🗎"  FontSize="16" LineStackingStrategy="BlockLineHeight" LineHeight="17" VerticalAlignment="Center"/>
+                                <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                        <Style TargetType="TreeViewItem">
+                            <EventSetter Event="MouseDoubleClick" Handler="FileItem_MouseDoubleClick"/>
+                            <EventSetter Event="PreviewKeyDown" Handler="FileItem_KeyDown"/>
+                            <Setter Property="Tag" Value="{Binding}"/>
+                        </Style>
+                    </TreeView.Resources>
+                </TreeView>
+            </Border>
+         
 
             <GridSplitter Grid.Row="2"/>
 
-            <ListView x:Name="ResultsListView" Grid.Row="3" ItemsSource="{Binding SearchResults}">
-                <ListView.Resources>
-                    <Style TargetType="ListViewItem">
-                        <EventSetter Event="MouseDoubleClick" Handler="FileItem_MouseDoubleClick"/>
-                        <EventSetter Event="PreviewKeyDown" Handler="FileItem_KeyDown"/>
-                        <EventSetter Event="Selected" Handler="ListViewItem_Selected"/>
-                        <Setter Property="Tag" Value="{Binding}"/>
-                    </Style>
-                </ListView.Resources>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Name}" Margin="2" FontWeight="Bold"/>
-                                <!--<TextBlock Text="{Binding DateLastModified}" Margin="2"/>-->
+            <Border  Grid.Row="3" Background="{Binding Background, ElementName=ResultsListView}">
+                <ListView x:Name="ResultsListView"  ItemsSource="{Binding SearchResults}" BorderThickness="0">
+                    <ListView.Resources>
+                        <Style TargetType="ListViewItem">
+                            <EventSetter Event="MouseDoubleClick" Handler="FileItem_MouseDoubleClick"/>
+                            <EventSetter Event="PreviewKeyDown" Handler="FileItem_KeyDown"/>
+                            <EventSetter Event="Selected" Handler="ListViewItem_Selected"/>
+                            <Setter Property="Tag" Value="{Binding}"/>
+                        </Style>
+                    </ListView.Resources>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Name}" Margin="2" FontWeight="Bold"/>
+                                    <!--<TextBlock Text="{Binding DateLastModified}" Margin="2"/>-->
+                                </StackPanel>
+                                <!--<TextBlock Text="{Binding Directory}" Margin="2"/>-->
                             </StackPanel>
-                            <!--<TextBlock Text="{Binding Directory}" Margin="2"/>-->
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Border>
+          
         </Grid>
 
         <GridSplitter Grid.Column="1" Grid.Row="2"/>

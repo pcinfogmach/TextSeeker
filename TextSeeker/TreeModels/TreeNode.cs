@@ -21,6 +21,7 @@ namespace TextSeeker
         private TreeNode _parent;
         private ObservableCollection<TreeNode> _children = new ObservableCollection<TreeNode>();
         private bool? _isChecked = true;
+        public float searchScore;
 
         public TreeNode(string path)
         {   
