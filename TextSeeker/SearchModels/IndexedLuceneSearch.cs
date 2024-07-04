@@ -5,6 +5,7 @@ using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
+using Lucene.Net.Search.VectorHighlight;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
 using System;
@@ -17,18 +18,16 @@ using TextSeeker.Helpers;
 
 namespace TextSeeker.SearchModels
 {
-    internal class LuceneSearch
+    internal class IndexedLuceneSearch
     {
         string indexPath;
         Analyzer analyzer;
 
-        public LuceneSearch()
+        public IndexedLuceneSearch()
         {
-            indexPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeeker", "TextSeekerIndex");
-            if (!System.IO.Directory.Exists(indexPath))
-            {
-                System.IO.Directory.CreateDirectory(indexPath);
-            }
+            //indexPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeeker", "TextSeekerIndex");
+            indexPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TextSeekerIndex");
+            if (!System.IO.Directory.Exists(indexPath)) {  System.IO.Directory.CreateDirectory(indexPath); }
             analyzer = new HebrewAnalyzer(LuceneVersion.LUCENE_48);
         }
 
@@ -47,12 +46,10 @@ namespace TextSeeker.SearchModels
                             new StringField("Path", file, Field.Store.YES),
                             new TextField("Content", content, Field.Store.YES)
                         };
+                      
+                        var term = new Term("Path", file); // Create a term to search for the existing document by its path
 
-                        // Create a term to search for the existing document by its path
-                        var term = new Term("Path", file);
-
-                        // Update the document if it exists, otherwise add it
-                        writer.UpdateDocument(term, doc);
+                        writer.UpdateDocument(term, doc);  // Update the document if it exists, otherwise add it
                     }
 
                     writer.Flush(triggerMerge: true, applyAllDeletes: true);
@@ -89,16 +86,16 @@ namespace TextSeeker.SearchModels
                 var query = parser.Parse(queryText);
 
                 var topDocs = searcher.Search(query, int.MaxValue);
-                List<TreeNode> results = new List<TreeNode>();
 
+                List<TreeNode> results = new List<TreeNode>();
                 foreach (var scoreDoc in topDocs.ScoreDocs)
                 {
                     var path = searcher.Doc(scoreDoc.Doc).Get("Path");
-                    results.Add(checkedTreeNodes.FirstOrDefault(node => node.Path == path));
+                    var result = checkedTreeNodes.FirstOrDefault(node => node.Path == path);
+                    results.Add(result) ;
                 }
                 return results;
             }
-
         }
     }
 }

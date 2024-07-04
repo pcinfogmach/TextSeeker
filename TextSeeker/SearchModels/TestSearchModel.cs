@@ -17,7 +17,7 @@ using System.Collections.ObjectModel;
 
 namespace TextSeeker.SearchModels
 {
-    public static class SearchModel
+    public static class TestSearchModel
     {
         public enum SearchType { ContainsSearch, LooseSearch, RegexSearch, TamperedRegexSearch}
 

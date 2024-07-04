@@ -1,5 +1,6 @@
 ﻿using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Core;
+using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Analysis.TokenAttributes;
 using Lucene.Net.Util;
 using System;
@@ -15,21 +16,22 @@ namespace TextSeeker.SearchModels
     internal class HebrewAnalyzer : Analyzer
     {
         LuceneVersion version;
-        public HebrewAnalyzer(LuceneVersion luceneVersion) 
+        public HebrewAnalyzer(LuceneVersion luceneVersion)
         {
             version = luceneVersion;
         }
         protected override TokenStreamComponents CreateComponents(string fieldName, TextReader reader)
         {
-            var tokenizer = new WhitespaceTokenizer(version, reader);
-            TokenStream filter = new HebrewTokenFilter(tokenizer); // Custom filter with cleaning logic
+            var tokenizer = new StandardTokenizer(version, reader);
+            TokenStream filter = new HebrewTokenFilter(tokenizer);
+            filter = new LowerCaseFilter(version, filter);
+            filter = new StopFilter(version, filter, StopAnalyzer.ENGLISH_STOP_WORDS_SET);
             return new TokenStreamComponents(tokenizer, filter);
         }
 
         sealed class HebrewTokenFilter : TokenFilter
         {
             private readonly ICharTermAttribute termAttr;
-            private static readonly Regex TrimRegex = new Regex(@" \W+|\W+ ", RegexOptions.Compiled);
 
             public HebrewTokenFilter(TokenStream input) : base(input)
             {
@@ -41,18 +43,16 @@ namespace TextSeeker.SearchModels
                 if (m_input.IncrementToken())
                 {
                     string token = termAttr.ToString();
-                    string cleanedToken = CleanText(token);
-                    termAttr.SetEmpty().Append(cleanedToken);
+                    string cleanedToken = Regex.Replace(token, @"\p{M}", "");
+
+                    if (!string.Equals(token, cleanedToken))
+                    {
+                        termAttr.SetEmpty().Append(cleanedToken);
+                    }
+
                     return true;
                 }
                 return false;
-            }
-
-            private string CleanText(string input)
-            {
-                input = Regex.Replace(input, @"\p{M}", ""); // Remove diacritics
-                input = TrimRegex.Replace(input, " "); // Trim non-word characters
-                return input;
             }
         }
     }

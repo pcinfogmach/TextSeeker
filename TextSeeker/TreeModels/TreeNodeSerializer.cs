@@ -1,36 +1,29 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Threading.Tasks;
+using System.Reflection;
 
 namespace TextSeeker.TreeModels
 {
-    internal class TreeNodeSerializer
+    internal static class TreeNodeSerializer
     {
-        string _jsonFilePath;
-        public string JsonFilePath
+        public static string Serialize(TreeNode rootNode)
         {
-            get { return _jsonFilePath; }
-            set {  _jsonFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeeker", value); }
-        }
-
-        public void SaveToFile(TreeNode rootnode)
-        {
-            string jsonText = JsonConvert.SerializeObject(rootnode, new JsonSerializerSettings
+            return JsonConvert.SerializeObject(rootNode, new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.Auto,
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
                 Formatting = Formatting.Indented
             });
-            File.WriteAllText(JsonFilePath, jsonText);
         }
 
-        public TreeNode LoadFromFile()
+        public static TreeNode Load(string jsonText)
         {
-            if (!File.Exists(JsonFilePath)) { return new TreeNode(null); }
+            if (string.IsNullOrEmpty(jsonText)) { return new TreeNode(null); }
             else
             {
-                string jsonText = File.ReadAllText(JsonFilePath);
                 TreeNode rootNode = JsonConvert.DeserializeObject<TreeNode>(jsonText, new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Auto,
@@ -43,7 +36,7 @@ namespace TextSeeker.TreeModels
             }
         }
 
-        private void SetParentReferences(TreeNode parentNode)
+        private static void SetParentReferences(TreeNode parentNode)
         {
             foreach (var child in parentNode.Children)
             {

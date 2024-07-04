@@ -42,14 +42,14 @@ namespace TextSeeker.TreeModels
             List<string> files = new List<string>();
             foreach (var treeNode in rootNode.Children)
             {
-                if (treeNode is FolderTreeNode folderTreeNode) 
+                if (treeNode is FolderTreeNode folderTreeNode)
                 {
-                    files.AddRange(System.IO.Directory.GetFiles(folderTreeNode.Path, "*.*", System.IO.SearchOption.AllDirectories));
+                    files.AddRange(GetAllFileNodes(folderTreeNode));
                 }
                 else if (treeNode is FileTreeNode fileTreeNode)
-                { 
-                    files.Add(treeNode.Path); 
-                }              
+                {
+                    files.Add(fileTreeNode.Path);
+                }
             }
             return files;
         }

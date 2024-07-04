@@ -1,19 +1,22 @@
-﻿using Microsoft.Web.WebView2.Wpf;
+﻿using com.mchange.v2.c3p0.stmt;
+using Microsoft.Web.WebView2.Wpf;
+using sun.swing;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using TextSeeker.SearchModels;
 
 namespace TextSeeker.Helpers
 {
     public static class WebView2Helpers
     {
-        public static void NavigateTostring(WebView2 webView2, string input, string searchTerm, bool isRegexPattern)
+        public static void NavigateTostring(WebView2 webView2, string content)
         {
-            if(!isRegexPattern) { Regex.Escape(input); }
-            input = CreateHtmlPage(input, searchTerm);
-
-            string htmlFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeeker", "TextSeekerTextPreview.html");
-            File.WriteAllText(htmlFilePath, input);
+            content = CreateHtmlPage(content);
+            //string htmlFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TextSeeker", "TextSeekerTextPreview.html");
+            string htmlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TextSeekerTextPreview.html");
+            File.WriteAllText(htmlFilePath, content);
             
             webView2.Dispatcher.Invoke(() =>
             {
@@ -22,7 +25,7 @@ namespace TextSeeker.Helpers
             });
         }
 
-        static string CreateHtmlPage(string input, string searchTerm)
+        static string CreateHtmlPage(string input)
         {
             return $@"<!DOCTYPE html>
 <html lang=""he"">
@@ -39,29 +42,11 @@ namespace TextSeeker.Helpers
 </head>
 <body dir=""auto"">
     <div class=""container"">
-      {Highlight(input, searchTerm)}
+      {input}
     </div>
 </body>
-<script>
- window.find('{searchTerm}')
-</script>
 </html>
 ";
-        }
-
-        static string Highlight(string input, string searchTerm)
-        {
-            string escapedTerm = Regex.Escape(searchTerm);
-            string wildcardPattern = escapedTerm
-                   .Replace("\\*", "[א-ת\"]+")
-                   .Replace("\\?", ".");
-
-            string[] searchTerms = searchTerm.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string term in searchTerms)
-            {
-                input = Regex.Replace(input, wildcardPattern, $"<mark>$&</mark>", RegexOptions.IgnoreCase);
-            }
-            return input;
         }
     }
 }

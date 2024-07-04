@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using org.bouncycastle.mail.smime.examples;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -20,6 +21,8 @@ namespace TextSeeker
         private DateTime _dateLastModified;
         private TreeNode _parent;
         private ObservableCollection<TreeNode> _children = new ObservableCollection<TreeNode>();
+        public List<TreeNode> AllTreeNodes = new List<TreeNode>();
+        private bool _isSelected;
         private bool? _isChecked = true;
         public float searchScore;
 
@@ -123,8 +126,23 @@ namespace TextSeeker
             }
         }
 
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged(nameof(IsSelected));
+                }
+            }
+        }
+
         public void AddChild(TreeNode child)
         {
+            child.AllTreeNodes = this.AllTreeNodes;
+            AllTreeNodes.Add(child);
             child.Parent = this;
             _children.Add(child);
             OnPropertyChanged(nameof(Children));
@@ -141,17 +159,18 @@ namespace TextSeeker
 
         void UpdateChildCheckSatus(bool? value)
         {
-            foreach (TreeNode child in Children)
+            if (value != null && Children.Any(child => child.IsChecked != value)) 
             {
-                if (value != null) { child.IsChecked = value; }
+                foreach (TreeNode child in Children) { child.IsChecked = value; }
             }
         }
+
         void UpdateParentCheckSatus()
         {
             if (Parent != null)
             {
-                bool allChecked = Parent.Children.OfType<TreeNode>().All(child => child.IsChecked == true);
-                bool allUnchecked = Parent.Children.OfType<TreeNode>().All(child => child.IsChecked == false);
+                bool allChecked = Children.All(child => child.IsChecked == true);
+                bool allUnchecked = Children.All(child => child.IsChecked == false);
 
                 if (allChecked) { Parent.IsChecked = true; }
                 else if (allUnchecked) { Parent.IsChecked = false; }
