@@ -1,6 +1,8 @@
 ﻿using Lucene.Net.Analysis;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.QueryParsers.ComplexPhrase;
+using Lucene.Net.QueryParsers.Flexible.Core.Parser;
+using Lucene.Net.QueryParsers.Flexible.Standard.Parser;
 using Lucene.Net.Search;
 using Lucene.Net.Search.Spans;
 using Lucene.Net.Util;
@@ -30,7 +32,7 @@ internal class CostumeQueryParser : ComplexPhraseQueryParser
         }
         catch
         {
-            return base.Parse("parsing error placeholder");
+            return new Lucene.Net.QueryParsers.Simple.SimpleQueryParser(Analyzer, Field).Parse(queryText);
         }
     }
 

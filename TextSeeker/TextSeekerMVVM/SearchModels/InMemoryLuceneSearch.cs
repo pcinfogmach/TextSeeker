@@ -104,7 +104,8 @@ namespace TextSeeker.SearchModels
             return Array.Empty<string>();
         }
 
-        string[] GetFragments(IndexSearcher searcher, int docId, Query query)
+
+        public string[] GetFragments(IndexSearcher searcher, int docId, Query query)
         {
             var reader = searcher.IndexReader;
             var scorer = new QueryScorer(query);

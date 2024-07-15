@@ -19,12 +19,12 @@ namespace TextSeeker.TreeModels
             });
         }
 
-        public static TreeNode Load(string jsonText)
+        public static RootTreeNode Load(string jsonText)
         {
-            if (string.IsNullOrEmpty(jsonText)) { return new TreeNode(null); }
+            if (string.IsNullOrEmpty(jsonText)) { return new RootTreeNode(null); }
             else
             {
-                TreeNode rootNode = JsonConvert.DeserializeObject<TreeNode>(jsonText, new JsonSerializerSettings
+                RootTreeNode rootNode = JsonConvert.DeserializeObject<RootTreeNode>(jsonText, new JsonSerializerSettings
                 {
                     TypeNameHandling = TypeNameHandling.Auto,
                     PreserveReferencesHandling = PreserveReferencesHandling.Objects,

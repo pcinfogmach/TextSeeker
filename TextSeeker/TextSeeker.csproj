@@ -269,6 +269,9 @@
     <Reference Include="Microsoft.Maui.Graphics, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Maui.Graphics.8.0.40\lib\netstandard2.0\Microsoft.Maui.Graphics.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Office.Interop.Word, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Microsoft.Web.WebView2.Core, Version=1.0.2535.41, Culture=neutral, PublicKeyToken=2a8ab48044d2601e, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.WebView2.1.0.2535.41\lib\net462\Microsoft.Web.WebView2.Core.dll</HintPath>
     </Reference>
@@ -313,6 +316,7 @@
     <Reference Include="OpenMcdf, Version=2.3.1.0, Culture=neutral, PublicKeyToken=fdbb1629d7c00800, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenMcdf.2.3.1\lib\net40\OpenMcdf.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="Prism, Version=7.2.0.1422, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Core.7.2.0.1422\lib\net45\Prism.dll</HintPath>
     </Reference>
@@ -491,6 +495,7 @@
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -530,26 +535,51 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="XpdfNet, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XpdfNet.1.2.0\lib\net45\XpdfNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Helpers\DistanceCalculator.cs" />
-    <Compile Include="Helpers\TextExtractor.cs" />
-    <Compile Include="Helpers\WebView2Helpers.cs" />
-    <Compile Include="SearchModels\CostumeQueryParser.cs" />
-    <Compile Include="SearchModels\HebrewAnalyzer.cs" />
-    <Compile Include="SearchModels\InMemoryLuceneSearch.cs" />
-    <Compile Include="SearchModels\IndexedLuceneSearch.cs" />
-    <Compile Include="TreeModels\TreeBuilder.cs" />
-    <Compile Include="TreeModels\TreeHelper.cs" />
-    <Compile Include="TreeModels\TreeNode.cs" />
-    <Compile Include="SearchModels\TestSearchModel.cs" />
-    <Compile Include="TreeModels\TreeNodeSerializer.cs" />
-    <Compile Include="ViewModels\TextSeekerViewModel.cs" />
-    <Compile Include="Helpers\INotifyBase.cs" />
+    <Compile Include="TextSeekerMVVM\Helpers\DistanceCalculator.cs" />
+    <Compile Include="TextSeekerMVVM\Helpers\HtmlConverter.cs" />
+    <Compile Include="TextSeekerMVVM\Helpers\IcommandBase.cs" />
+    <Compile Include="TextSeekerMVVM\Helpers\StringExtensions.cs" />
+    <Compile Include="TextSeekerMVVM\Helpers\StringToIntConvereter.cs" />
+    <Compile Include="TextSeekerMVVM\Helpers\SubtractConverter.cs" />
+    <Compile Include="TextSeekerMVVM\Helpers\TextExtractor.cs" />
+    <Compile Include="TextSeekerMVVM\Helpers\WebView2Helpers.cs" />
+    <Compile Include="Old\OldMainWindow.xaml.cs">
+      <DependentUpon>OldMainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Old\OldViewModel.cs" />
+    <Compile Include="TextSeekerMVVM\SearchModels\CostumeQueryParser.cs" />
+    <Compile Include="TextSeekerMVVM\SearchModels\HebrewAnalyzer.cs" />
+    <Compile Include="TextSeekerMVVM\SearchModels\InMemoryLuceneSearch.cs" />
+    <Compile Include="TextSeekerMVVM\SearchModels\IndexedLuceneSearch.cs" />
+    <Compile Include="TextSeekerMVVM\PreviewControlView.xaml.cs">
+      <DependentUpon>PreviewControlView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TextSeekerMVVM\SearchModels\LuceneFragmentor.cs" />
+    <Compile Include="TextSeekerMVVM\SearchModels\ResultItem.cs" />
+    <Compile Include="TextSeekerMVVM\TextSeekerView.xaml.cs">
+      <DependentUpon>TextSeekerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Old\TreeBuilder.cs" />
+    <Compile Include="Old\TreeHelper.cs" />
+    <Compile Include="TextSeekerMVVM\Themes\DropDownButton.cs" />
+    <Compile Include="TextSeekerMVVM\Themes\HighLightTextBlock.cs" />
+    <Compile Include="TextSeekerMVVM\Themes\ResultsWebView.cs" />
+    <Compile Include="TextSeekerMVVM\Themes\WebViewX.cs" />
+    <Compile Include="TextSeekerMVVM\TreeModels\TreeLoader.cs" />
+    <Compile Include="TextSeekerMVVM\TreeModels\TreeNode.cs" />
+    <Compile Include="TextSeekerMVVM\SearchModels\TestSearchModel.cs" />
+    <Compile Include="Old\TreeNodeSerializer.cs" />
+    <Compile Include="TextSeekerMVVM\TextSeekerViewModel.cs" />
+    <Compile Include="TextSeekerMVVM\Helpers\INotifyBase.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -562,6 +592,30 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Old\OldMainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextSeekerMVVM\Themes\DropDownDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextSeekerMVVM\PreviewControlView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextSeekerMVVM\Themes\TextSeekerResourceDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextSeekerMVVM\TextSeekerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextSeekerMVVM\Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -662,6 +716,51 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\SearchFolder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\StopIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Downloads\PdfiumViewer.WPF-master\src\PdfiumViewer.Demo\PdfiumViewer.Demo.csproj">
+      <Project>{679de5db-7388-4cf5-bed2-0f890f0ac2b8}</Project>
+      <Name>PdfiumViewer.Demo</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Downloads\PdfiumViewer.WPF-master\src\PdfiumViewer\PdfiumViewer.csproj">
+      <Project>{60d3c75c-e71d-4116-bd7e-cac68c4dd96b}</Project>
+      <Name>PdfiumViewer</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\DocumentPlusIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ListIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\NextIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\PreviousIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\TextDocumentIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Docnet.Core.2.6.0\build\net45\Docnet.Core.targets" Condition="Exists('..\packages\Docnet.Core.2.6.0\build\net45\Docnet.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -673,7 +772,9 @@
     <Error Condition="!Exists('..\packages\SixLabors.ImageSharp.3.1.4\build\SixLabors.ImageSharp.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SixLabors.ImageSharp.3.1.4\build\SixLabors.ImageSharp.props'))" />
     <Error Condition="!Exists('..\packages\Tesseract.5.2.0\build\Tesseract.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Tesseract.5.2.0\build\Tesseract.targets'))" />
     <Error Condition="!Exists('..\packages\Obfuscar.2.2.38\build\obfuscar.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Obfuscar.2.2.38\build\obfuscar.props'))" />
+    <Error Condition="!Exists('..\packages\XpdfNet.1.2.0\build\XpdfNet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\XpdfNet.1.2.0\build\XpdfNet.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.Web.WebView2.1.0.2535.41\build\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.2535.41\build\Microsoft.Web.WebView2.targets')" />
   <Import Project="..\packages\Tesseract.5.2.0\build\Tesseract.targets" Condition="Exists('..\packages\Tesseract.5.2.0\build\Tesseract.targets')" />
+  <Import Project="..\packages\XpdfNet.1.2.0\build\XpdfNet.targets" Condition="Exists('..\packages\XpdfNet.1.2.0\build\XpdfNet.targets')" />
 </Project>

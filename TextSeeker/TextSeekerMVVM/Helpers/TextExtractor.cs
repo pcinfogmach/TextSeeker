@@ -20,30 +20,42 @@ namespace TextSeeker.Helpers
                 filePath = filePath.ToLower();
                 if (filePath.EndsWith(".pdf"))
                 {
-                    content = DocNetPdfTextExtractor(filePath);
+                    content = PdfTextExtractor(filePath);
                 }
-                //else if (filePath.EndsWith(".txt"))
-                //{
-                //    return File.ReadAllText(filePath);
-                //}
+                else if (filePath.Contains("ToratEmetInstall")||filePath.Contains("ToratEmetUserData"))
+                {
+                    return File.ReadAllText(filePath, Encoding.GetEncoding("Windows-1255"));
+                }
                 else
                 {
                     content = Toxy.ParserFactory.CreateText(new Toxy.ParserContext(filePath)).Parse();
                 }
             }
-            catch (System.NotSupportedException)
+            catch 
             {
-                var textExtractor = new TikaOnDotNet.TextExtraction.TextExtractor();
-                var result = textExtractor.Extract(filePath);
-                content = result.Text;
-            }
-            catch (Exception ex)
-            {
-                content = string.Empty; 
+                try
+                {
+                    var result = new TikaOnDotNet.TextExtraction.TextExtractor().Extract(filePath);
+                    content = result.Text;
+                }
+                catch { }
+                
             }
             return content.Trim();
         }
 
+        static string PdfTextExtractor(string filePath)
+        {
+            try
+            {
+                var helper = new XpdfNet.XpdfHelper();
+                return helper.ToText(filePath);
+            }
+            catch
+            {
+                return DocNetPdfTextExtractor(filePath);
+            }
+        }
         static string DocNetPdfTextExtractor(string filePath)
         {
             var pageTextDictionary = new ConcurrentDictionary<int, string>();

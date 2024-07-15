@@ -9,10 +9,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace TextSeeker
+namespace TextSeeker.TreeModels
 {
-    public class FolderTreeNode : TreeNode  {    public FolderTreeNode(string path) : base(path) { } }
-    public class FileTreeNode : TreeNode {  public FileTreeNode(string path) : base(path) { } }
+    public class RootTreeNode : TreeNode
+    {
+        public List<TreeNode> AllTreeNodes = new List<TreeNode>();
+        public RootTreeNode(string path) : base(path) { }
+    }
+    public class FolderTreeNode : TreeNode { public FolderTreeNode(string path) : base(path) { } }
+    public class FileTreeNode : TreeNode { public FileTreeNode(string path) : base(path) { } }
     public class TreeNode : INotifyBase
     {
         private string _name;
@@ -21,13 +26,12 @@ namespace TextSeeker
         private DateTime _dateLastModified;
         private TreeNode _parent;
         private ObservableCollection<TreeNode> _children = new ObservableCollection<TreeNode>();
-        public List<TreeNode> AllTreeNodes = new List<TreeNode>();
         private bool _isSelected;
         private bool? _isChecked = true;
         public float searchScore;
 
         public TreeNode(string path)
-        {   
+        {
             if (string.IsNullOrWhiteSpace(path)) { return; }
             _path = path;
             _directory = System.IO.Path.GetDirectoryName(path);
@@ -114,16 +118,7 @@ namespace TextSeeker
         public bool? IsChecked
         {
             get { return _isChecked; }
-            set
-            {
-                if (_isChecked != value)
-                {
-                    _isChecked = value;
-                    OnPropertyChanged(nameof(IsChecked));
-                    UpdateChildCheckSatus(value);
-                    UpdateParentCheckSatus();
-                }
-            }
+            set { this.SetIsChecked(value, true, true); }
         }
 
         public bool IsSelected
@@ -141,11 +136,8 @@ namespace TextSeeker
 
         public void AddChild(TreeNode child)
         {
-            child.AllTreeNodes = this.AllTreeNodes;
-            AllTreeNodes.Add(child);
             child.Parent = this;
-            _children.Add(child);
-            OnPropertyChanged(nameof(Children));
+            Children.Add(child);
         }
 
         public void RemoveChild(TreeNode child)
@@ -157,30 +149,63 @@ namespace TextSeeker
             }
         }
 
-        void UpdateChildCheckSatus(bool? value)
+        void SetIsChecked(bool? value, bool updateChildren, bool updateParent)
         {
-            if (value != null && Children.Any(child => child.IsChecked != value)) 
+            if (value == _isChecked)
+                return;
+
+            _isChecked = value;
+
+            if (updateChildren && _isChecked.HasValue)
             {
-                foreach (TreeNode child in Children) { child.IsChecked = value; }
+                foreach (var child in Children)
+                {
+                    child.SetIsChecked(_isChecked, true, false);
+                }
             }
+
+            if (updateParent && _parent != null)
+                _parent.VerifyCheckState();
+
+            this.OnPropertyChanged("IsChecked");
         }
 
-        void UpdateParentCheckSatus()
+        void VerifyCheckState()
         {
-            if (Parent != null)
+            bool? state = null;
+            for (int i = 0; i < this.Children.Count; ++i)
             {
-                bool allChecked = Children.All(child => child.IsChecked == true);
-                bool allUnchecked = Children.All(child => child.IsChecked == false);
-
-                if (allChecked) { Parent.IsChecked = true; }
-                else if (allUnchecked) { Parent.IsChecked = false; }
-                else { Parent.IsChecked = null; }
+                bool? current = this.Children[i].IsChecked;
+                if (i == 0)
+                {
+                    state = current;
+                }
+                else if (state != current)
+                {
+                    state = null;
+                    break;
+                }
             }
+            this.SetIsChecked(state, false, true);
+        }
+
+        public List<string> GetAllFilePaths()
+        {
+            List<string> files = new List<string>();
+            if (this is FolderTreeNode)
+            {
+                files.AddRange(System.IO.Directory.GetFiles(Path, "*.*", System.IO.SearchOption.AllDirectories));
+            }
+            else if (this is FileTreeNode) 
+            {
+                files.Add(this.Path);
+            }
+            return files;
         }
 
         public TreeNode HardCopy()
         {
-            if (this is FileTreeNode) 
+            if (this is FileTreeNode)
             {
                 FileTreeNode treeNode = new FileTreeNode(Path);
                 foreach (var node in Children)
@@ -189,7 +214,7 @@ namespace TextSeeker
                 }
                 return treeNode;
             }
-            else if (this is FolderTreeNode) 
+            else if (this is FolderTreeNode)
             {
                 FolderTreeNode treeNode = new FolderTreeNode(Path);
                 foreach (var node in Children)

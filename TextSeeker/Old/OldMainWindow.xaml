@@ -1,0 +1,246 @@
+﻿<UserControl x:Class="TextSeeker.Old.OldMainWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TextSeeker.Old"
+                 mc:Ignorable="d" 
+             xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+xmlns:treeItems="clr-namespace:TextSeeker"
+xmlns:helpers="clr-namespace:TextSeeker.Helpers"
+xmlns:webView="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+xmlns:vm="clr-namespace:TextSeeker.TextSeekerMVVM"
+FontFamily="Segoe UI Semilight"
+FontSize="14"
+Background="#FFF3F3F3"
+FlowDirection="RightToLeft"
+Height="450" Width="800"
+FocusManager.FocusedElement="{Binding ElementName=SearchTextBox}">
+    <!--<UserControl.DataContext>
+        <vm:TextSeekerViewModel x:Name="viewModel"/>
+    </UserControl.DataContext>-->
+
+    <!--<Grid Margin="5" FlowDirection="LeftToRight">
+        <Grid.Resources>
+            <Style TargetType="Border">
+                <Setter Property="CornerRadius" Value="3"/>
+                <Setter Property="BorderBrush" Value="LightGray"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="1"/>
+            </Style>
+            <Style TargetType="Button">
+                <Style.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="1"/>
+                    </Style>
+                </Style.Resources>
+                <Setter Property="Background" Value="{x:Null}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FlowDirection" Value="LeftToRight"/>
+                <Setter Property="Padding" Value="3"/>
+                <Setter Property="Padding" Value="1"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
+            </Style>
+            <Style TargetType="ToggleButton">
+                <Style.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="1"/>
+                    </Style>
+                </Style.Resources>
+                <Setter Property="Background" Value="{x:Null}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FlowDirection" Value="LeftToRight"/>
+                <Setter Property="Padding" Value="3"/>
+                <Setter Property="Padding" Value="1"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
+            </Style>
+            --><!--<Style TargetType="ListViewItem">
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="LightGray"/>
+                    </Trigger>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="LightGray"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>--><!--
+            <Style TargetType="Image">
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
+                <Setter Property="Height" Value="20"/>
+            </Style>
+            <Style TargetType="GridSplitter">
+                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border x:Name="SearchPanel" IsEnabled="{Binding SearchIsEnabled}"
+                 Grid.Row="0" Grid.ColumnSpan="3" 
+                 BorderBrush="LightGray" BorderThickness="1"
+                 Background="White">
+            <Grid>
+                <TextBox x:Name="SearchTextBox" BorderThickness="0" VerticalAlignment="Center" Margin="2,0,2,0"
+                             Text="{Binding SearchTerm , UpdateSourceTrigger=PropertyChanged, BindsDirectlyToSource=True, Mode=TwoWay}" 
+                             PreviewKeyDown="SearchTextBox_PreviewKeyDown" GotKeyboardFocus="SearchTextBox_GotKeyboardFocus"
+                             FlowDirection="RightToLeft"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <StackPanel.Resources>
+                    </StackPanel.Resources>
+                    <Grid>
+                        <Button x:Name="SearchHistoryButton" Width="12" Margin="0"
+                            Click="SearchHistoryButton_Click" ToolTip="חיפושים אחרונים">
+                            <TextBlock Text="⏷" FontSize="10"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       LineHeight="8" LineStackingStrategy="BlockLineHeight"/>
+                        </Button>
+                        <ComboBox x:Name="SearchHistoryComboBox" Width="0" ItemsSource="{Binding RecentSearches}"
+                              HorizontalAlignment="Left"                   
+                              SelectionChanged="SearchHistoryComboBox_SelectionChanged" SelectedIndex="-1"/>
+                    </Grid>
+                    <Grid>
+                        <Button x:Name="StopSearchButton" Width="25" Visibility="{Binding StopButtonvisibilty}"
+                             Click="SearchButton_Click" Margin="0">
+                            <TextBlock Text="■" FontSize="12" VerticalAlignment="Center"/>
+                        </Button>
+                        <Button x:Name="SearchButton" Visibility="{Binding SearchButtonvisibilty}"
+                            Click="SearchButton_Click" Margin="0">
+                            <Image Source="/Resources/SearchIcon.png" Height="16"/>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <ProgressBar x:Name="progressBar" Height="5" BorderThickness="0" Background="{x:Null}"
+               IsIndeterminate="{Binding IsSearchInProgress}"
+                     Grid.ColumnSpan="3" Grid.Row="1"/>
+
+        <Border x:Name="SearchInstructions" Grid.Row="2" Grid.ColumnSpan="3"
+                BorderBrush="LightGray" BorderThickness="1" Background="White"
+                Visibility="{Binding SearchInstructionsVisibilty}"   
+                Margin="0,0,0,5">
+            <TextBox IsReadOnly="True" FlowDirection="RightToLeft" VerticalContentAlignment="Center" FontSize="12" FontWeight="Bold"
+         Text="* = קידומות או סיומות     ? = כתי?ב חסר     | = או א' | או ב'    ( )|( ) = (או קבוצה א') | (או קבוצה ב')     ~ = חיפוש מטושטש על מילה זו"
+                     BorderThickness="0">
+            </TextBox>
+        </Border>
+
+        <Grid x:Name="ItemsPanel" Grid.Row="5" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal" Grid.Row="0"
+                        MinWidth="200" Margin="0,0,0,2">
+                <Button x:Name="AddTreeItem">
+                    <Image Source="/Resources/AddFolderIcon.png" />
+                </Button>
+                <Button x:Name="RemoveTreeItem" Click="DeleteTreeItemButton_Click">
+                    <Image Source="/Resources/DeleteFolderIcon.png" />
+                </Button>
+                <ToggleButton x:Name="IndexedSearchToggle" ToolTip="חיפוש באינדקס" IsChecked="{Binding IsIndexSearch}">
+                    <Image Source="/Resources/SearchDataBase.png" Height="18"/>
+                </ToggleButton>
+                --><!--<Grid x:Name="IndexMenu" Visibility="{Binding IndexOptionsVisiblity}">
+                    <ComboBox Width="0" x:Name="IndexMenuList" HorizontalAlignment="Left">
+                        <ComboBoxItem x:Name="NewIndexComboBoxItem" Content="צור אינדקס חדש"/>
+                        <ComboBoxItem x:Name="DeleteIndexComboBoxItem" Content="מחק את האינדקס"/>
+                    </ComboBox>
+                    <Button x:Name="IndexMenuButton"  ToolTip="אפשרויות אינדקס"
+                            Click="IndexMenuButton_Click">
+                        <Image Source="/Resources/DataBaseImport.png" Height="18"/>
+                    </Button>
+                </Grid>--><!--
+
+
+                <Button x:Name="OnceOffSearchButton" Visibility="{Binding SearchButtonvisibilty}"
+                        ToolTip="חיפוש חד פעמי בתיקייה מסויימת" Click="OnceOffSearchButton_Click">
+                    <Image Source="/Resources/SearchFolder.png" />
+                </Button>
+
+                <ToggleButton x:Name="SearchInstructionsToggle" ToolTip="הצג הוראות חיפוש מתקדם"
+                              IsChecked="{Binding ShowSearchInstructions}">
+                    <Image Source="/Resources/InformationIcon.png" Height="25" Margin="-5,-10,-5,-10"/>
+                </ToggleButton>
+            </StackPanel>
+
+            <Border Grid.Row="1" Background="{Binding Background, ElementName=treeView}">
+                <TreeView x:Name="treeView" ItemsSource="{Binding RootTreeViewNode.Children}"
+                          dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
+             PreviewKeyDown="treeView_PreviewKeyDown"
+                          BorderThickness="0">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type treeItems:FolderTreeNode}" ItemsSource="{Binding Children, Mode=TwoWay}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="📁" FontSize="14" LineStackingStrategy="BlockLineHeight" LineHeight="15" VerticalAlignment="Center"/>
+                                <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type treeItems:FileTreeNode}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🗎"  FontSize="16" LineStackingStrategy="BlockLineHeight" LineHeight="17" VerticalAlignment="Center"/>
+                                <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Margin="5,0,5,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                        <Style TargetType="TreeViewItem">
+                            <EventSetter Event="MouseDoubleClick" Handler="FileItem_MouseDoubleClick"/>
+                            <EventSetter Event="PreviewMouseRightButtonDown" Handler="FileItem_PreviewMouseRightButtonDown"/>
+                            <EventSetter Event="PreviewKeyDown" Handler="FileItem_KeyDown"/>
+                            <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                        </Style>
+                    </TreeView.Resources>
+                </TreeView>
+            </Border>
+
+            <GridSplitter Grid.Row="2"/>
+
+            <Border  Grid.Row="3" Background="{Binding Background, ElementName=ResultsListView}">
+                <ListView x:Name="ResultsListView"  ItemsSource="{Binding SearchResults}" BorderThickness="0">
+                    <ListView.Resources>
+                        <Style TargetType="ListViewItem">
+                            <EventSetter Event="MouseDoubleClick" Handler="FileItem_MouseDoubleClick"/>
+                            <EventSetter Event="PreviewMouseRightButtonDown" Handler="FileItem_PreviewMouseRightButtonDown"/>
+                            <EventSetter Event="PreviewKeyDown" Handler="FileItem_KeyDown"/>
+                            <EventSetter Event="Selected" Handler="ListViewItem_Selected"/>
+                            <Setter Property="Tag" Value="{Binding}"/>
+                            <Setter Property="Content" Value="{Binding Name}"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Margin" Value="2"/>
+                        </Style>
+                    </ListView.Resources>
+                </ListView>
+            </Border>
+
+        </Grid>
+
+        <GridSplitter Grid.Column="1" Grid.Row="4"/>
+
+        <Border x:Name="PreviewPanel" Background="White" BorderBrush="LightGray" BorderThickness="1"
+                Grid.Row="4" Grid.RowSpan="2" Grid.Column="2">
+            <Grid>
+                <TextBlock Text="תצוגה מקדימה" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="LightGray"/>
+                <webView:WebView2 Name="PreviewBrowser"/>
+            </Grid>
+        </Border>
+
+    </Grid>-->
+    </UserControl>
+

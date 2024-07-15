@@ -25,13 +25,15 @@ namespace TextSeeker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool IsIndexedSearch {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
+            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
+            "tring />\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection RecentSearchCollection {
             get {
-                return ((bool)(this["IsIndexedSearch"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["RecentSearchCollection"]));
             }
             set {
-                this["IsIndexedSearch"] = value;
+                this["RecentSearchCollection"] = value;
             }
         }
         
@@ -40,48 +42,26 @@ namespace TextSeeker.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
             "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
             "tring />\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection RecentSearches {
+        public global::System.Collections.Specialized.StringCollection RootFolderNodes {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["RecentSearches"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["RootFolderNodes"]));
             }
             set {
-                this["RecentSearches"] = value;
+                this["RootFolderNodes"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string MostRecentSearchTerm {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsd=\"http://www.w3." +
+            "org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n  <s" +
+            "tring />\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection CheckedFileNodes {
             get {
-                return ((string)(this["MostRecentSearchTerm"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["CheckedFileNodes"]));
             }
             set {
-                this["MostRecentSearchTerm"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string UnIndexedTreeView {
-            get {
-                return ((string)(this["UnIndexedTreeView"]));
-            }
-            set {
-                this["UnIndexedTreeView"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string IndexedTreeView {
-            get {
-                return ((string)(this["IndexedTreeView"]));
-            }
-            set {
-                this["IndexedTreeView"] = value;
+                this["CheckedFileNodes"] = value;
             }
         }
     }

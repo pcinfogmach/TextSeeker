@@ -1,19 +1,11 @@
 ﻿using Docnet.Core.Models;
 using Docnet.Core;
-using Lucene.Net.Search;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TextSeeker.Helpers;
-using TextSeeker.Models;
-using TextSeeker.ViewModels;
 using System.Threading;
-using javax.naming.directory;
-using System.Collections.ObjectModel;
+using TextSeeker.TreeModels;
 
 namespace TextSeeker.SearchModels
 {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using TextSeeker.TreeModels;
 
 namespace TextSeeker.Models
 {
@@ -15,17 +16,14 @@ namespace TextSeeker.Models
             var existingNode = parentNode.Children.FirstOrDefault(node => node.Path == rootFolderPath);
             if (existingNode != null)
             {
-                existingNode.Children.Clear();
-                PopulateChildren(rootFolderPath, existingNode);
-                return existingNode as FolderTreeNode;
+                existingNode.Parent.RemoveChild(existingNode);
             }
-            else
-            {
-                FolderTreeNode rootNode = new FolderTreeNode(rootFolderPath);
-                parentNode.AddChild(rootNode);
-                PopulateChildren(rootFolderPath, rootNode);
-                return rootNode;
-            }
+
+            FolderTreeNode rootNode = new FolderTreeNode(rootFolderPath);
+            parentNode.AddChild(rootNode);
+            PopulateChildren(rootFolderPath, rootNode);
+            return rootNode;
+
         }
 
 
